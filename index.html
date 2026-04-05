@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>imgBynan</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'><circle cx='5' cy='5' r='4.3' fill='white'/></svg>">
-<link rel="apple-touch-icon" href="https://t3.ftcdn.net/jpg/17/01/25/88/360_F_1701258829_qQmEuXWgxho9lDeiUcCsd0q5iIFrOLGA.jpg">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0a0a'/><circle cx='50' cy='50' r='30' fill='white'/></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a0a0a'/><circle cx='50' cy='50' r='30' fill='white'/></svg>">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="imgBynan">
@@ -815,7 +815,7 @@ if(!CanvasRenderingContext2D.prototype.roundRect){
 /* ── PWA Manifest ── */
 (()=>{
   const m={name:'imgBynan',short_name:'imgBynan',description:'Image editor by Nan',
-    icons:[{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="%230a0a0a"/><circle cx="50" cy="50" r="40" fill="white"/></svg>',sizes:'any',type:'image/svg+xml'}],
+    icons:[{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%230a0a0a"/><circle cx="50" cy="50" r="30" fill="white"/></svg>',sizes:'any',type:'image/svg+xml',purpose:'any maskable'}],
     start_url:location.href,display:'standalone',
     background_color:'#0a0a0a',theme_color:'#0a0a0a',orientation:'any'};
   const b=new Blob([JSON.stringify(m)],{type:'application/manifest+json'});
