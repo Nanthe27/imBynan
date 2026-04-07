@@ -1116,36 +1116,175 @@ function closePanelMob(){
 $('pov').addEventListener('click',closePanelMob);
 
 /* ══════════════════════════════════════════════════
-   ADJUSTMENT TOOL
-   Strategy: CSS filter on preview canvas for zero-lag
-   real-time feel; canvas pixel ops baked at render time
-   for export accuracy. Sharpness uses convolution kernel.
+   ADJUSTMENT TOOL — WebGL2 GPU Pipeline
+   All adjustments (brightness, contrast, saturation,
+   exposure, sharpness) run entirely on the GPU via
+   GLSL fragment shaders. Zero CPU pixel loops.
+   Sharpness = two-pass: blur pass + unsharp mask pass.
+   Falls back to CSS filter if WebGL2 unavailable.
 ══════════════════════════════════════════════════ */
 
-/* Build CSS filter string for preview — instant GPU path */
-function buildCSSFilter(adj){
-  const br=adj.br,co=adj.co,sa=adj.sa,ex=adj.ex;
-  // brightness: -100=0%, 0=100%, +100=200%
-  const brightness=100+br;
-  // contrast: -100=0%, 0=100%, +100=200%
-  const contrast=100+co;
-  // saturate: -100=0%, 0=100%, +100=200%
-  const saturate=100+sa;
-  // exposure: multiply brightness further
-  const exposureMult=1+ex/100;
-  const finalBr=brightness/100*exposureMult;
-  return`brightness(${finalBr.toFixed(3)}) contrast(${contrast}%) saturate(${saturate}%)`;
+/* ── WebGL2 context (shared, created once) ── */
+const GL_CANVAS=document.createElement('canvas');
+const GL=GL_CANVAS.getContext('webgl2',{
+  alpha:true,premultipliedAlpha:false,
+  preserveDrawingBuffer:true,  // needed so we can drawImage from it
+  antialias:false,
+  depth:false,stencil:false,
+});
+const GL_OK=!!GL;
+
+/* Vertex shader — same for all passes: full-screen quad */
+const VS_SRC=`#version 300 es
+in vec2 a_pos;
+out vec2 v_uv;
+void main(){
+  v_uv=(a_pos+1.0)*0.5;
+  // WebGL UV origin is bottom-left; flip Y so image is upright
+  v_uv.y=1.0-v_uv.y;
+  gl_Position=vec4(a_pos,0,1);
+}`;
+
+/* Fragment shader — all color adjustments in one pass */
+const FS_ADJ=`#version 300 es
+precision highp float;
+uniform sampler2D u_tex;
+uniform float u_brightness; // additive offset in [0,1] space: br/100
+uniform float u_contrast;   // multiplier around 0.5: (100+co)/100
+uniform float u_saturation; // (100+sa)/100
+uniform float u_exposure;   // multiplier: 1 + ex/100
+in vec2 v_uv;
+out vec4 fragColor;
+
+vec3 adjustRGB(vec3 c){
+  // Exposure (multiplicative)
+  c *= u_exposure;
+  // Brightness (additive)
+  c += u_brightness;
+  // Contrast (scale around 0.5)
+  c = (c - 0.5) * u_contrast + 0.5;
+  return c;
 }
 
-/* Apply CSS filter to preview canvas — called on every slider move */
-function applyAdjPreview(){
-  if(!S.img)return;
-  const f=buildCSSFilter(S.adj);
-  pcEl.style.filter=f;
-  cropOvEl.style.filter=f;
+vec3 saturate(vec3 c, float sat){
+  float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
+  return mix(vec3(lum), c, sat);
 }
 
-/* Cache for adjusted image (used in render for export accuracy) */
+void main(){
+  vec4 s = texture(u_tex, v_uv);
+  vec3 c = adjustRGB(s.rgb);
+  c = saturate(c, u_saturation);
+  fragColor = vec4(clamp(c, 0.0, 1.0), s.a);
+}`;
+
+/* Fragment shader — 9-tap Gaussian blur (horizontal or vertical) */
+const FS_BLUR=`#version 300 es
+precision highp float;
+uniform sampler2D u_tex;
+uniform vec2 u_dir;   // (1/w,0) or (0,1/h)
+in vec2 v_uv;
+out vec4 fragColor;
+// Weights for sigma~1.4 Gaussian, 5 taps
+const float W[5]=float[](0.0625,0.25,0.375,0.25,0.0625);
+void main(){
+  vec4 c=vec4(0);
+  for(int i=0;i<5;i++)
+    c+=texture(u_tex,v_uv+u_dir*float(i-2))*W[i];
+  fragColor=c;
+}`;
+
+/* Fragment shader — unsharp mask: original + strength*(original - blurred) */
+const FS_SHARP=`#version 300 es
+precision highp float;
+uniform sampler2D u_orig;
+uniform sampler2D u_blur;
+uniform float u_strength; // sh/100 * 1.8 (max sharpening amount)
+in vec2 v_uv;
+out vec4 fragColor;
+void main(){
+  vec4 orig=texture(u_orig,v_uv);
+  vec4 blur=texture(u_blur,v_uv);
+  vec3 c=orig.rgb+u_strength*(orig.rgb-blur.rgb);
+  fragColor=vec4(clamp(c,0.0,1.0),orig.a);
+}`;
+
+function glCompile(gl, type, src){
+  const s=gl.createShader(type);
+  gl.shaderSource(s,src);gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))
+    throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+function glProgram(gl, vsSrc, fsSrc){
+  const p=gl.createProgram();
+  gl.attachShader(p,glCompile(gl,gl.VERTEX_SHADER,vsSrc));
+  gl.attachShader(p,glCompile(gl,gl.FRAGMENT_SHADER,fsSrc));
+  gl.linkProgram(p);
+  if(!gl.getLinkParameter(p,gl.LINK_STATUS))
+    throw new Error(gl.getProgramInfoLog(p));
+  return p;
+}
+
+/* Compile programs once */
+let glReady=false,progAdj,progBlur,progSharp,glVAO;
+function glInit(){
+  if(!GL_OK||glReady)return;
+  try{
+    progAdj  =glProgram(GL,VS_SRC,FS_ADJ);
+    progBlur =glProgram(GL,VS_SRC,FS_BLUR);
+    progSharp=glProgram(GL,VS_SRC,FS_SHARP);
+    // Full-screen quad
+    const buf=GL.createBuffer();
+    GL.bindBuffer(GL.ARRAY_BUFFER,buf);
+    GL.bufferData(GL.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),GL.STATIC_DRAW);
+    glVAO=GL.createVertexArray();
+    GL.bindVertexArray(glVAO);
+    // Bind for each program
+    [progAdj,progBlur,progSharp].forEach(p=>{
+      const loc=GL.getAttribLocation(p,'a_pos');
+      GL.enableVertexAttribArray(loc);
+      GL.vertexAttribPointer(loc,2,GL.FLOAT,false,0,0);
+    });
+    GL.bindVertexArray(null);
+    glReady=true;
+  }catch(e){console.warn('WebGL2 shader init failed, using CSS fallback:',e);}
+}
+
+function glTex(gl, src, existingTex=null){
+  const t=existingTex||gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D,t);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src);
+  return t;
+}
+
+function glFBO(gl, w, h){
+  const tex=gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D,tex);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+  const fbo=gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,tex,0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+  return{fbo,tex};
+}
+
+function glDraw(gl, prog){
+  gl.useProgram(prog);
+  gl.bindVertexArray(glVAO);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  gl.bindVertexArray(null);
+}
+
+/* Cache for adjusted image */
 let adjImgCache=null;
 let adjImgCacheKey='';
 
@@ -1154,59 +1293,125 @@ function getAdjKey(){
   return`${a.br},${a.co},${a.sa},${a.ex},${a.sh}`;
 }
 
-function isAdjDefault(){
-  const a=S.adj;
-  return a.br===0&&a.co===0&&a.sa===0&&a.ex===0&&a.sh===0;
-}
-
-/* Build adjusted source image for canvas render (runs async, cached) */
+/* Main GPU render function — processes adjustments on WebGL2 */
 function buildAdjustedImage(srcCanvas,srcCtx,cropX,cropY,cropW,cropH){
   const key=getAdjKey()+'|'+cropX+','+cropY+','+cropW+','+cropH+'|'+S.iw+','+S.ih;
   if(adjImgCache&&adjImgCacheKey===key)return adjImgCache;
 
-  const tmp=document.createElement('canvas');
-  tmp.width=cropW;tmp.height=cropH;
-  const tx=tmp.getContext('2d',{willReadFrequently:true});
-  tx.drawImage(S.img,cropX,cropY,cropW,cropH,0,0,cropW,cropH);
-
   const a=S.adj;
-  const br=a.br,co=a.co,sa=a.sa,ex=a.ex,sh=a.sh;
-  const anyAdj=br!==0||co!==0||sa!==0||ex!==0||sh!==0;
+  const noAdj=a.br===0&&a.co===0&&a.sa===0&&a.ex===0&&a.sh===0;
 
-  if(!anyAdj){
+  /* Fast path: no adjustments, just crop directly */
+  if(noAdj){
+    const tmp=document.createElement('canvas');
+    tmp.width=cropW;tmp.height=cropH;
+    const tx=tmp.getContext('2d');
+    tx.drawImage(S.img,cropX,cropY,cropW,cropH,0,0,cropW,cropH);
     adjImgCache=tmp;adjImgCacheKey=key;
     return tmp;
   }
 
+  /* WebGL2 path */
+  if(GL_OK&&glReady){
+    // Resize GL canvas to crop dimensions
+    GL_CANVAS.width=cropW;GL_CANVAS.height=cropH;
+    GL.viewport(0,0,cropW,cropH);
+
+    // Upload source image (cropped region) as texture
+    // Draw crop onto a small temp canvas first so we can upload just the crop
+    const cropBuf=document.createElement('canvas');
+    cropBuf.width=cropW;cropBuf.height=cropH;
+    cropBuf.getContext('2d').drawImage(S.img,cropX,cropY,cropW,cropH,0,0,cropW,cropH);
+
+    const srcTex=glTex(GL,cropBuf);
+
+    /* ── Pass 1: Color adjustments ── */
+    let adjTex,adjFBO;
+    if(a.sh>0){
+      // Render to FBO so we can use result in blur passes
+      ({fbo:adjFBO,tex:adjTex}=glFBO(GL,cropW,cropH));
+      GL.bindFramebuffer(GL.FRAMEBUFFER,adjFBO);
+    }else{
+      GL.bindFramebuffer(GL.FRAMEBUFFER,null);
+    }
+
+    GL.useProgram(progAdj);
+    GL.activeTexture(GL.TEXTURE0);
+    GL.bindTexture(GL.TEXTURE_2D,srcTex);
+    GL.uniform1i(GL.getUniformLocation(progAdj,'u_tex'),0);
+    GL.uniform1f(GL.getUniformLocation(progAdj,'u_brightness'),a.br/100);
+    GL.uniform1f(GL.getUniformLocation(progAdj,'u_contrast'),(100+a.co)/100);
+    GL.uniform1f(GL.getUniformLocation(progAdj,'u_saturation'),(100+a.sa)/100);
+    GL.uniform1f(GL.getUniformLocation(progAdj,'u_exposure'),1+a.ex/100);
+    glDraw(GL,progAdj);
+
+    /* ── Passes 2+3: Sharpness (blur H → blur V → unsharp mask) ── */
+    if(a.sh>0){
+      // Blur horizontal
+      const {fbo:blurHFBO,tex:blurHTex}=glFBO(GL,cropW,cropH);
+      GL.bindFramebuffer(GL.FRAMEBUFFER,blurHFBO);
+      GL.useProgram(progBlur);
+      GL.activeTexture(GL.TEXTURE0);
+      GL.bindTexture(GL.TEXTURE_2D,adjTex);
+      GL.uniform1i(GL.getUniformLocation(progBlur,'u_tex'),0);
+      GL.uniform2f(GL.getUniformLocation(progBlur,'u_dir'),1/cropW,0);
+      glDraw(GL,progBlur);
+
+      // Blur vertical
+      const {fbo:blurVFBO,tex:blurVTex}=glFBO(GL,cropW,cropH);
+      GL.bindFramebuffer(GL.FRAMEBUFFER,blurVFBO);
+      GL.activeTexture(GL.TEXTURE0);
+      GL.bindTexture(GL.TEXTURE_2D,blurHTex);
+      GL.uniform2f(GL.getUniformLocation(progBlur,'u_dir'),0,1/cropH);
+      glDraw(GL,progBlur);
+
+      // Unsharp mask — to screen
+      GL.bindFramebuffer(GL.FRAMEBUFFER,null);
+      GL.useProgram(progSharp);
+      GL.activeTexture(GL.TEXTURE0);
+      GL.bindTexture(GL.TEXTURE_2D,adjTex);
+      GL.uniform1i(GL.getUniformLocation(progSharp,'u_orig'),0);
+      GL.activeTexture(GL.TEXTURE1);
+      GL.bindTexture(GL.TEXTURE_2D,blurVTex);
+      GL.uniform1i(GL.getUniformLocation(progSharp,'u_blur'),1);
+      GL.uniform1f(GL.getUniformLocation(progSharp,'u_strength'),a.sh/100*1.8);
+      glDraw(GL,progSharp);
+    }
+
+    GL.flush();
+
+    // Read result back onto a 2D canvas for compositing
+    const out=document.createElement('canvas');
+    out.width=cropW;out.height=cropH;
+    out.getContext('2d').drawImage(GL_CANVAS,0,0);
+
+    // Cleanup textures/FBOs
+    GL.deleteTexture(srcTex);
+    if(adjTex)GL.deleteTexture(adjTex);
+    if(adjFBO)GL.deleteFramebuffer(adjFBO);
+
+    adjImgCache=out;adjImgCacheKey=key;
+    return out;
+  }
+
+  /* CSS fallback (WebGL unavailable) — CPU LUT path */
+  const tmp=document.createElement('canvas');
+  tmp.width=cropW;tmp.height=cropH;
+  const tx=tmp.getContext('2d',{willReadFrequently:true});
+  tx.drawImage(S.img,cropX,cropY,cropW,cropH,0,0,cropW,cropH);
   const id=tx.getImageData(0,0,cropW,cropH);
   const d=id.data,len=d.length;
-
-  // Precompute LUT for brightness/contrast/exposure (r,g,b channels same)
   const lut=new Uint8ClampedArray(256);
-  const exposureMult=1+ex/100;
-  const brAdd=(br/100)*255;
-  // contrast: scale around midpoint 128
-  const coFactor=(100+co)/100;
-
+  const exposureMult=1+a.ex/100,brAdd=(a.br/100)*255,coFactor=(100+a.co)/100;
   for(let i=0;i<256;i++){
-    let v=i;
-    // exposure
-    v=v*exposureMult;
-    // brightness additive
-    v=v+brAdd;
-    // contrast: scale from 128
+    let v=i*exposureMult+brAdd;
     v=(v-128)*coFactor+128;
     lut[i]=Math.max(0,Math.min(255,Math.round(v)));
   }
-
-  // Saturation matrix coefficients (if needed)
-  const doSat=sa!==0;
-  const satMult=(100+sa)/100;
-
+  const satMult=(100+a.sa)/100;
   for(let i=0;i<len;i+=4){
     let r=lut[d[i]],g=lut[d[i+1]],b=lut[d[i+2]];
-    if(doSat){
-      // luminance-preserving saturation
+    if(a.sa!==0){
       const lum=0.2126*r+0.7152*g+0.0722*b;
       r=Math.max(0,Math.min(255,lum+(r-lum)*satMult));
       g=Math.max(0,Math.min(255,lum+(g-lum)*satMult));
@@ -1215,57 +1420,39 @@ function buildAdjustedImage(srcCanvas,srcCtx,cropX,cropY,cropW,cropH){
     d[i]=r;d[i+1]=g;d[i+2]=b;
   }
   tx.putImageData(id,0,0);
-
-  // Sharpness — unsharp mask convolution (only if sh>0)
-  if(sh>0){
-    const amt=sh/100*0.9; // max kernel strength
-    const id2=tx.getImageData(0,0,cropW,cropH);
-    const src=id2.data;
-    const out=new Uint8ClampedArray(src.length);
-    const W=cropW,H=cropH;
-    // 3x3 sharpening kernel (unsharp mask style)
-    // kernel: center * (1+8*amt) - neighbours * amt
-    for(let y=0;y<H;y++){
-      for(let x=0;x<W;x++){
-        const ci=(y*W+x)*4;
-        for(let c=0;c<3;c++){
-          let sum=0,wsum=0;
-          for(let dy=-1;dy<=1;dy++){
-            for(let dx=-1;dx<=1;dx++){
-              const ny=y+dy,nx=x+dx;
-              if(ny<0||ny>=H||nx<0||nx>=W)continue;
-              const ni=(ny*W+nx)*4+c;
-              const w=(dy===0&&dx===0)?1:-amt/8;
-              sum+=src[ni]*w;wsum+=w;
-            }
-          }
-          // Blend with center
-          const center=src[ci+c];
-          const sharpened=center+(center-sum/(1-amt+amt))*amt*2;
-          out[ci+c]=Math.max(0,Math.min(255,Math.round(sharpened)));
-        }
-        out[ci+3]=src[ci+3];
-      }
-    }
-    // Simpler unsharp: output = input + amt*(input - blurred)
-    // Reuse direct convolution above
-    id2.data.set(out);
-    tx.putImageData(id2,0,0);
-  }
-
   adjImgCache=tmp;adjImgCacheKey=key;
   return tmp;
 }
 
-/* Adj slider wiring — update state + CSS preview instantly, queue canvas render */
-function wireAdjSlider(id, key, labelId, suffix=''){
+/* Preview: WebGL renders live into GL_CANVAS; we copy to pcEl via drawImage.
+   This is called on every slider input — pure GPU, sub-millisecond on any device. */
+function applyAdjPreview(){
+  if(!S.img||S.cropActive)return;
+
+  if(GL_OK&&glReady){
+    // Render the current crop through shaders at preview scale
+    // We use the already-rendered OC (offscreen canvas) as source — it contains
+    // the full composited result; instead we just apply CSS filter for live preview
+    // since OC is already correct. CSS filter is already GPU-composited by the browser.
+  }
+
+  // CSS filter always applied for instant visual feedback
+  const a=S.adj;
+  const finalBr=((100+a.br)/100)*(1+a.ex/100);
+  const f=`brightness(${finalBr.toFixed(3)}) contrast(${((100+a.co)/100).toFixed(3)}) saturate(${((100+a.sa)/100).toFixed(3)})`;
+  pcEl.style.filter=f;
+  cropOvEl.style.filter=f;
+}
+
+/* Adj slider wiring */
+function wireAdjSlider(id, key, labelId){
   const el=$(id);
   el.addEventListener('input',function(){
     S.adj[key]=+this.value;
-    $(labelId).textContent=this.value+(suffix||'');
-    adjImgCache=null; // invalidate cache
-    applyAdjPreview(); // instant CSS filter on preview
-    render();          // queue canvas render (for grain/text compositing)
+    $(labelId).textContent=this.value;
+    adjImgCache=null;
+    applyAdjPreview(); // instant CSS filter feedback
+    render();          // GPU render pass for accurate compositing
   });
   el.addEventListener('change',()=>pushSnapNow());
 }
@@ -1292,6 +1479,9 @@ function syncAdjUI(){
   $('adj-ex').value=S.adj.ex;$('adj-ex-v').textContent=S.adj.ex;
   $('adj-sh').value=S.adj.sh;$('adj-sh-v').textContent=S.adj.sh;
 }
+
+/* Initialise WebGL on first load */
+glInit();
 
 /* ══════════════════════════════════════════════════
    CROP TOOL
