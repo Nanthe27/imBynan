@@ -61,8 +61,18 @@ header{
 .logo{font-weight:700;font-size:1.2rem;letter-spacing:-.03em;color:var(--text)}
 .logo em{color:var(--text2);font-style:normal;font-weight:400}
 .hdr-c{display:flex;align-items:center;gap:4px}
+.hdr-div{width:1px;height:20px;background:var(--border);margin:0 4px}
+.hdr-txt-btn{
+  padding:5px 10px;border-radius:6px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);font-family:'Quicksand',sans-serif;
+  font-weight:600;font-size:.68rem;cursor:pointer;transition:all var(--t);white-space:nowrap;
+}
+.hdr-txt-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+.hdr-txt-btn:active{transform:scale(.94)}
+.hdr-txt-btn:disabled{opacity:.28;pointer-events:none}
 .hdr-r{display:flex;align-items:center;gap:8px;justify-content:flex-end}
 .ver{font-family:'Ubuntu',sans-serif;font-size:.65rem;color:var(--text3);letter-spacing:.06em}
+.hdr-clock{font-family:'Ubuntu',sans-serif;font-size:.7rem;font-variant-numeric:tabular-nums;letter-spacing:.04em;color:var(--text);transition:color var(--t)}
 .icon-btn{
   width:32px;height:32px;border-radius:8px;border:1px solid var(--border);
   background:transparent;color:var(--text2);cursor:pointer;
@@ -75,7 +85,7 @@ header{
 
 /* ── Upload ── */
 #upload-view{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:28px;background:var(--bg);z-index:5;
   transition:opacity .4s var(--spring),transform .4s var(--spring);
 }
@@ -135,6 +145,50 @@ header{
 }
 .new-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
 .new-btn:active{transform:scale(.97)}
+
+/* ── Folder Strip ── */
+.folder-strip{
+  width:80px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);
+  display:none;flex-direction:column;overflow:hidden;
+  transition:background var(--t),border-color var(--t);
+}
+.folder-strip.active{display:flex}
+.fs-label{font-family:'Ubuntu',sans-serif;font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);padding:8px 6px 4px;text-align:center;flex-shrink:0}
+.fs-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:4px 6px;display:flex;flex-direction:column;gap:4px}
+.fs-thumb{
+  width:100%;aspect-ratio:1;border-radius:6px;overflow:hidden;cursor:pointer;
+  border:2px solid transparent;position:relative;flex-shrink:0;
+  transition:border-color .15s,opacity .15s;background:var(--bg4);
+}
+.fs-thumb:hover{border-color:var(--border2)}
+.fs-thumb.active{border-color:var(--act)}
+.fs-thumb.editing{border-color:#34c759;box-shadow:0 0 8px rgba(52,199,89,.35)}
+.fs-thumb.editing.active{border-color:#34c759}
+.fs-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.fs-thumb .fs-name{
+  position:absolute;bottom:0;left:0;right:0;padding:2px 3px;
+  font-family:'Ubuntu',sans-serif;font-size:.5rem;color:#fff;
+  background:rgba(0,0,0,.6);text-align:center;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;
+}
+.fs-add{
+  width:100%;padding:8px 4px;border-radius:6px;border:1.5px dashed var(--border);
+  background:transparent;color:var(--text3);cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:all var(--t);margin-top:2px;
+}
+.fs-add:hover{border-color:var(--border2);color:var(--text);background:var(--bg3)}
+.fs-bot{padding:4px 6px 8px;flex-shrink:0}
+
+/* Folder open button on homepage */
+.folder-btn{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 18px;border-radius:20px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);font-family:'Quicksand',sans-serif;
+  font-weight:600;font-size:.78rem;cursor:pointer;transition:all var(--t);
+  margin:14px auto 0;
+}
+.folder-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+.folder-btn:active{transform:scale(.95)}
 
 /* ── Canvas Wrap ── */
 .canvas-wrap{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;background:var(--bg)}
@@ -197,7 +251,9 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .chk{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;width:fit-content}
 .chk input[type=checkbox]{display:none}
 .chkb{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
-.chk input:checked+.chkb{background:var(--act);border-color:var(--act)}
+.chkb svg{opacity:0;transition:opacity .15s}
+.chk input:checked+.chkb{background:#ffffff;border-color:#ffffff}
+.chk input:checked+.chkb svg{opacity:1;stroke:#000000}
 .chk-lbl{font-family:'Ubuntu',sans-serif;font-size:.82rem}
 
 /* Segment */
@@ -208,6 +264,18 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 
 /* Color Picker */
 .cp-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+
+/* Expand fill color options */
+.col-opts{display:flex;gap:6px}
+.col-opt{
+  width:30px;height:30px;border-radius:6px;cursor:pointer;flex-shrink:0;
+  border:2px solid var(--border2);transition:transform .15s,box-shadow .15s;
+}
+.col-opt:hover{transform:scale(1.1)}
+.col-opt.active{box-shadow:0 0 0 1.5px var(--bg2),0 0 0 3px var(--act);transform:scale(1.12)}
+.col-opt.w{background:#ffffff}
+.col-opt.b{background:#000000}
+
 .cp-swatch{
   width:30px;height:30px;border-radius:6px;cursor:pointer;flex-shrink:0;
   border:2px solid var(--border2);transition:transform .15s,box-shadow .15s;
@@ -242,8 +310,33 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .fo:hover{border-color:var(--border2)}
 .fo.active{border-color:var(--act);background:var(--act);color:var(--actT)}
 
-/* Position grid */
-.pos-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+/* Position presets */
+.pos-presets{display:flex;background:var(--bg3);border-radius:var(--rs);padding:3px;gap:2px}
+.pos-presets .pb{
+  flex:1;padding:8px 2px;border-radius:5px;border:none;
+  background:transparent;color:var(--text2);font-family:'Quicksand',sans-serif;
+  font-weight:600;font-size:.72rem;cursor:pointer;transition:all .15s;
+  text-align:center;white-space:nowrap;
+}
+.pos-presets .pb:hover{background:var(--bg4);color:var(--text)}
+.pos-presets .pb.active{background:var(--act);color:var(--actT);box-shadow:var(--shadow2)}
+.arrow-pad{
+  display:grid;grid-template-columns:36px 36px 36px;grid-template-rows:36px 36px 36px;
+  gap:3px;justify-content:center;
+}
+.arrow-btn{
+  width:36px;height:36px;border-radius:var(--rs);border:1.5px solid var(--border);
+  background:var(--bg3);color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.arrow-btn:hover{border-color:var(--border2);background:var(--bg4);color:var(--text)}
+.arrow-btn:active{transform:scale(.9);background:var(--act);color:var(--actT)}
+.arrow-center{
+  width:36px;height:36px;border-radius:var(--rs);border:1px solid var(--border);
+  background:var(--bg4);color:var(--text3);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;
+}
+.arrow-center:hover{color:var(--text);background:var(--bg5)}
 .pb{padding:7px 2px;border-radius:var(--rs);border:1.5px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Ubuntu',sans-serif;font-size:.7rem;text-align:center}
 .pb:hover{border-color:var(--border2);color:var(--text)}
 .pb.active{border-color:var(--act);background:var(--act);color:var(--actT)}
@@ -365,6 +458,30 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .exp-nav-back{padding:8px 14px;border-radius:20px;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'Quicksand',sans-serif;font-weight:600;font-size:.78rem;transition:all var(--t)}
 .exp-nav-back:hover{background:var(--bg3);color:var(--text)}
 
+/* Disclaimer link */
+.disc-link{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+  background:none;border:none;color:var(--text3);font-family:'Ubuntu',sans-serif;
+  font-size:.7rem;cursor:pointer;text-decoration:underline;transition:color var(--t);
+  letter-spacing:.03em;
+}
+.disc-link:hover{color:var(--text)}
+.disc-body{text-align:left}
+.disc-body p{font-family:'Ubuntu',sans-serif;font-size:.82rem;color:var(--text2);line-height:1.7;margin-bottom:14px}
+.disc-body ul{margin:0 0 14px 18px;list-style:disc}
+.disc-body li{font-family:'Ubuntu',sans-serif;font-size:.82rem;color:var(--text2);line-height:1.7;margin-bottom:8px}
+.disc-body .important{color:#e74c3c;font-weight:700}
+.disc-footer{font-family:'Ubuntu',sans-serif;font-size:.72rem;color:var(--text3);text-align:center;padding-top:14px;border-top:1px solid var(--border);margin-top:14px;font-style:italic}
+.disc-fb{text-align:center;padding-top:14px;border-top:1px solid var(--border);margin-top:14px}
+.disc-fb-title{font-family:'Quicksand',sans-serif;font-size:.84rem;font-weight:600;margin-bottom:10px}
+.disc-fb-btn{
+  display:inline-block;padding:8px 24px;border-radius:20px;
+  background:var(--act);color:var(--actT);font-family:'Quicksand',sans-serif;
+  font-weight:600;font-size:.8rem;text-decoration:none;border:none;cursor:pointer;
+  transition:opacity var(--t);
+}
+.disc-fb-btn:hover{opacity:.85}
+
 /* Toast */
 .toast{position:fixed;bottom:82px;left:50%;translate:-50% 14px;background:var(--act);color:var(--actT);padding:8px 20px;border-radius:22px;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.8rem;z-index:200;opacity:0;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.35);transition:all .3s var(--spring)}
 .toast.show{opacity:1;translate:-50% 0}
@@ -391,6 +508,7 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
   .new-btn span{display:none}
   .new-btn{justify-content:center;padding:9px}
   .s-bot{width:100%;display:flex;justify-content:center}
+  .folder-strip{width:64px}
 }
 
 /* Mobile */
@@ -399,6 +517,12 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
   .sidebar{display:none}
   .bnav{display:flex}
   .ed-body{flex-direction:column}
+  .folder-strip.active{flex-direction:row;width:100%;height:68px;border-right:none;border-bottom:1px solid var(--border)}
+  .fs-label{display:none}
+  .fs-list{flex-direction:row;padding:6px;gap:6px;overflow-x:auto;overflow-y:hidden}
+  .fs-thumb{width:52px;min-width:52px;aspect-ratio:1}
+  .fs-bot{padding:6px 4px;display:flex;align-items:center}
+  .fs-add{width:44px;min-width:44px;height:44px;padding:0;margin:0}
   .canvas-wrap{height:var(--mob-canvas);flex-shrink:0;flex-grow:0;display:flex;flex-direction:column}
   .cw{flex:1;padding:8px;min-height:0}
   .save-bar{padding:7px 10px;height:44px}
@@ -433,9 +557,13 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
     <button class="icon-btn" id="redo-btn" disabled title="Redo">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg>
     </button>
+    <div class="hdr-div"></div>
+    <button class="hdr-txt-btn" id="copy-edit-btn" disabled>Copy Edits</button>
+    <button class="hdr-txt-btn" id="paste-edit-btn" disabled>Paste Edits</button>
   </div>
   <div class="hdr-r">
-    <span class="ver">v4.0.0</span>
+    <span class="hdr-clock" id="hdr-clock">00:00:00</span>
+    <span class="ver">v4.2.1</span>
     <button class="icon-btn" id="theme-btn" title="Toggle theme">
       <svg id="theme-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
     </button>
@@ -446,19 +574,35 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 <!-- Upload -->
 <div id="upload-view">
   <div class="dz" id="dz">
-    <input type="file" id="fi" accept="image/*">
+    <input type="file" id="fi" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/tiff,image/avif,image/heic,image/heif,.jpg,.jpeg,.jfif,.png,.tiff,.tif,.bmp,.webp,.avif,.heic,.heif">
     <div class="dz-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
     </div>
     <div class="dz-title">Drop image here</div>
     <div class="dz-sub">or tap to browse</div>
-    <div class="dz-fmt">JPG &middot; PNG &middot; WEBP &middot; GIF</div>
+    <div class="dz-fmt">JPG &middot; JPEG &middot; JFIF &middot; PNG &middot; TIFF &middot; BMP &middot; WEBP &middot; AVIF &middot; HEIC</div>
   </div>
+  <button class="folder-btn" id="folder-btn">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+    Open Multiple Images
+  </button>
+  <input type="file" id="folder-fi" multiple accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/tiff,image/avif,image/heic,image/heif,.jpg,.jpeg,.jfif,.png,.tiff,.tif,.bmp,.webp,.avif,.heic,.heif" style="display:none">
+  <input type="file" id="add-fi" multiple accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/tiff,image/avif,image/heic,image/heif,.jpg,.jpeg,.jfif,.png,.tiff,.tif,.bmp,.webp,.avif,.heic,.heif" style="display:none">
+  <button class="disc-link" id="disc-open">Disclaimer</button>
 </div>
-
-<!-- Editor -->
 <div id="editor-view">
   <div class="ed-body">
+
+    <!-- Folder Strip -->
+    <div class="folder-strip" id="folder-strip">
+      <div class="fs-label">Images</div>
+      <div class="fs-list" id="fs-list"></div>
+      <div class="fs-bot">
+        <button class="fs-add" id="fs-add" title="Add more images">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -568,6 +712,20 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
       <div id="p-expand" class="panel">
         <div class="p-title">Expand</div>
         <div class="cg">
+          <div class="cl">Preset</div>
+          <div class="crop-presets" id="exp-presets">
+            <button class="cp-prb active" data-expratio="none">None</button>
+            <button class="cp-prb" data-expratio="1:1">1 : 1</button>
+            <button class="cp-prb" data-expratio="4:3">4 : 3</button>
+            <button class="cp-prb" data-expratio="3:4">3 : 4</button>
+            <button class="cp-prb" data-expratio="16:9">16 : 9</button>
+            <button class="cp-prb" data-expratio="9:16">9 : 16</button>
+            <button class="cp-prb" data-expratio="5:4">5 : 4</button>
+            <button class="cp-prb" data-expratio="4:5">4 : 5</button>
+          </div>
+        </div>
+        <div class="exp-divider"></div>
+        <div class="cg">
           <div class="cl">Fill Color <span class="cv" id="ecv">White</span></div>
           <div class="col-opts">
             <div class="col-opt w active" data-ec="white"></div>
@@ -645,15 +803,29 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
           <div class="cg"><textarea class="tinput" id="txt" rows="2" placeholder="Type your text..."></textarea></div>
           <div class="cg">
             <div class="cl">Position</div>
-            <div class="pos-grid">
-              <button class="pb" data-pos="tl">Top L</button><button class="pb" data-pos="tc">Top</button><button class="pb" data-pos="tr">Top R</button>
-              <button class="pb" data-pos="ml">Left</button><button class="pb active" data-pos="mc">Center</button><button class="pb" data-pos="mr">Right</button>
-              <button class="pb" data-pos="bl">Bot L</button><button class="pb" data-pos="bc">Bottom</button><button class="pb" data-pos="br">Bot R</button>
+            <div class="pos-presets">
+              <button class="pb" data-pos="tc">Top</button>
+              <button class="pb" data-pos="ml">Left</button>
+              <button class="pb active" data-pos="mc">Center</button>
+              <button class="pb" data-pos="mr">Right</button>
+              <button class="pb" data-pos="bc">Bottom</button>
             </div>
           </div>
           <div class="cg">
-            <div class="cl">Edge Offset <span class="cv" id="tof-v">40 px</span></div>
-            <input type="range" id="tof" min="0" max="2000" value="40">
+            <div class="cl">Move <span class="cv" id="txt-pos-v">0, 0</span></div>
+            <div class="arrow-pad">
+              <div></div>
+              <button class="arrow-btn" data-arrow="up"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+              <div></div>
+              <button class="arrow-btn" data-arrow="left"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+              <div class="arrow-center" id="arrow-reset" title="Reset position">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              </div>
+              <button class="arrow-btn" data-arrow="right"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+              <div></div>
+              <button class="arrow-btn" data-arrow="down"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+              <div></div>
+            </div>
           </div>
           <div class="cg">
             <div class="cl">Font Size <span class="cv" id="tsz-v">72 px</span></div>
@@ -741,6 +913,11 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
           <div class="cl">Blur <span class="cv" id="fd-blur-v">0 px</span></div>
           <input type="range" id="fd-blur" min="0" max="20" value="0">
         </div>
+        <label class="chk">
+          <input type="checkbox" id="fd-border">
+          <div class="chkb"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <span class="chk-lbl">Apply to border</span>
+        </label>
       </div>
 
     </div><!-- /tool-panel -->
@@ -831,11 +1008,61 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
   </div>
 </div>
 
+<!-- Paste Edits Warning -->
+<div class="modal-ov" id="paste-ov">
+  <div class="modal-box">
+    <div class="modal-title">Paste edits?</div>
+    <div class="modal-sub">Did you save your current edit? Pasting will replace all edits on this image with the copied ones.</div>
+    <div class="modal-actions">
+      <button class="m-btn" id="paste-cancel">Go Back</button>
+      <button class="m-btn pri" id="paste-ok">Paste Edits</button>
+    </div>
+  </div>
+</div>
+
+<!-- Switch Image Warning -->
+<div class="modal-ov" id="switch-ov">
+  <div class="modal-box">
+    <div class="modal-title">Start editing this image?</div>
+    <div class="modal-sub">Did you save your last edit? Starting a new edit session will clear all current edits on the previous image.</div>
+    <div class="modal-actions">
+      <button class="m-btn" id="switch-cancel">Go Back</button>
+      <button class="m-btn danger" id="switch-ok">Start Editing</button>
+    </div>
+  </div>
+</div>
+
+<!-- Disclaimer -->
+<div class="modal-ov" id="disc-ov">
+  <div class="modal-box lg">
+    <div class="modal-title" style="text-align:center">Disclaimer</div>
+    <div class="disc-body">
+      <p>Here's what you need to know:</p>
+      <ul>
+        <li>These are tested with small amounts of data. Bugs happen. Not guaranteed to work for everything.</li>
+        <li><span class="important">Use at Your Own Risk:</span> You're responsible for how you use this.</li>
+        <li><span class="important">No Promises on Support:</span> I appreciate feedback, but NO promise fixes for everything.</li>
+        <li><span class="important">THE BIG NO NO:</span> The creator takes NO responsibility for everything (this is free to use and you respond for yourself).</li>
+      </ul>
+      <p style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;text-align:center;color:var(--text)">Good news &mdash; all your work is processed on your own device (locally). Nothing is uploaded to any server.</p>
+      <ul>
+        <li>By using this, you're good with these terms. Enjoy!</li>
+      </ul>
+    </div>
+    <div class="disc-footer">Last Updated: February 2026</div>
+    <div class="disc-fb">
+      <div class="disc-fb-title">Have Feedback?</div>
+      <a href="https://t.me/nann27" target="_blank" class="disc-fb-btn">Feedback</a>
+    </div>
+    <div class="modal-actions" style="justify-content:center"><button class="m-btn" id="disc-close">Close</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 /* ══════════════════════════════════════════════════
-   imgBynan  v4.0.0
+   imgBynan  v4.2.1
 ══════════════════════════════════════════════════ */
 
 /* ── Polyfill roundRect ── */
@@ -940,7 +1167,7 @@ let S={
   texts:[], selTxt:-1,
   gr:{val:0,sz:1},
   rc:{r:0,outerR:0,innerR:0,ind:false},
-  fd:{top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0},
+  fd:{top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false},
   adj:{br:0,co:0,sa:0,ex:0,sh:0},
 };
 let textIdCounter=0;
@@ -983,6 +1210,78 @@ function updUR(){$('undo-btn').disabled=H.idx<=0;$('redo-btn').disabled=H.idx>=H
 $('undo-btn').addEventListener('click',undo);
 $('redo-btn').addEventListener('click',redo);
 
+/* ── Copy / Paste Edits ── */
+const CE_KEY='imgbynan-copied-edits';
+function getEditState(){
+  return{
+    ex:{...S.ex},gr:{...S.gr},rc:{...S.rc},fd:{...S.fd},adj:{...S.adj},
+    texts:JSON.parse(JSON.stringify(S.texts)),
+  };
+}
+function updateCopyPasteBtns(){
+  $('copy-edit-btn').disabled=!S.img;
+  const hasCopied=!!localStorage.getItem(CE_KEY);
+  $('paste-edit-btn').disabled=!S.img||!hasCopied;
+}
+$('copy-edit-btn').addEventListener('click',()=>{
+  if(!S.img)return;
+  localStorage.setItem(CE_KEY,JSON.stringify(getEditState()));
+  updateCopyPasteBtns();
+  showToast('Edits copied');
+});
+$('paste-edit-btn').addEventListener('click',()=>{
+  if(!S.img||!localStorage.getItem(CE_KEY))return;
+  openModal('paste-ov');
+});
+function applyPastedEdits(){
+  const raw=localStorage.getItem(CE_KEY);
+  if(!raw)return;
+  // If previewing a different image, load it first then paste
+  if(FOLDER.active&&FOLDER.previewing&&FOLDER.viewIdx!==FOLDER.editIdx){
+    const idx=FOLDER.viewIdx;
+    const file=FOLDER.files[idx];
+    FOLDER.editIdx=idx;FOLDER.viewIdx=idx;FOLDER.previewing=false;
+    updateFolderHighlights();
+    // Reset state for new image
+    if(S.cropActive)exitCropMode(false);
+    S.texts=[];S.selTxt=-1;
+    S.crop={x:0,y:0,w:0,h:0};S.cropDraft={...S.crop};S.cropRatio='free';
+    S.ex={all:0,t:0,b:0,l:0,r:0,col:'white',ind:false,inAll:0,inT:0,inB:0,inL:0,inR:0,inInd:false};
+    S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};
+    S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false};
+    S.adj={br:0,co:0,sa:0,ex:0,sh:0};adjImgCache=null;
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      S.img=img;S.iw=img.width;S.ih=img.height;
+      S.crop={x:0,y:0,w:S.iw,h:S.ih};S.cropDraft={...S.crop};
+      invalidateGrainCache();loadedFonts.clear();adjImgCache=null;
+      URL.revokeObjectURL(url);
+      doPasteEdits(raw);
+    };
+    img.onerror=()=>showToast('Could not load image');
+    img.src=url;
+    return;
+  }
+  doPasteEdits(raw);
+}
+function doPasteEdits(raw){
+  try{
+    const ed=JSON.parse(raw);
+    if(ed.ex)Object.assign(S.ex,ed.ex);
+    if(ed.gr)Object.assign(S.gr,ed.gr);
+    if(ed.rc)Object.assign(S.rc,ed.rc);
+    if(ed.fd)Object.assign(S.fd,ed.fd);
+    if(ed.adj){Object.assign(S.adj,ed.adj);adjImgCache=null;}
+    if(ed.texts){S.texts=ed.texts;S.selTxt=S.texts.length?0:-1;}
+    invalidateGrainCache();
+    syncAllUI();render();pushSnapNow();
+    showToast('Edits applied');
+  }catch(e){showToast('Could not paste edits');}
+}
+$('paste-cancel').addEventListener('click',()=>closeModal('paste-ov'));
+$('paste-ok').addEventListener('click',()=>{closeModal('paste-ov');applyPastedEdits();});
+
 /* ── Offscreen canvas ── */
 const OC=document.createElement('canvas');
 const OX=OC.getContext('2d',{alpha:true,willReadFrequently:true});
@@ -1007,11 +1306,18 @@ function applyTheme(t){
 $('theme-btn').addEventListener('click',()=>applyTheme(theme==='dark'?'light':'dark'));
 
 /* ── Upload ── */
+const SUPPORTED_EXT=/\.(jpe?g|jfif|png|tiff?|bmp|webp|avif|heic|heif|gif)$/i;
+function isImageFile(f){return f.type.startsWith('image/')||SUPPORTED_EXT.test(f.name);}
 const dz=$('dz'),fi=$('fi');
 dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
 dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
-dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))loadFile(f);});
-fi.addEventListener('change',e=>{if(e.target.files[0])loadFile(e.target.files[0]);});
+dz.addEventListener('drop',e=>{
+  e.preventDefault();dz.classList.remove('over');
+  const imgs=[...e.dataTransfer.files].filter(isImageFile);
+  if(imgs.length>1){enterFolderMode(imgs);}
+  else if(imgs.length===1){loadFile(imgs[0]);}
+});
+fi.addEventListener('change',e=>{const f=e.target.files[0];if(f&&isImageFile(f))loadFile(f);});
 document.addEventListener('paste',e=>{
   if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
   const item=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith('image/'));
@@ -1035,6 +1341,7 @@ function loadFile(file){
 function showEditor(){
   $('upload-view').classList.add('exit');
   $('editor-view').classList.add('active');
+  updateCopyPasteBtns();
 }
 
 function fullReset(){
@@ -1043,7 +1350,7 @@ function fullReset(){
   S.texts=[];S.selTxt=-1;
   S.crop={x:0,y:0,w:0,h:0};S.cropDraft={...S.crop};S.cropRatio='free';
   S.ex={all:0,t:0,b:0,l:0,r:0,col:'white',ind:false,inAll:0,inT:0,inB:0,inL:0,inR:0,inInd:false};
-  S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0};
+  S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false};
   S.adj={br:0,co:0,sa:0,ex:0,sh:0};
   adjImgCache=null;
   H.stack=[];H.idx=-1;updUR();
@@ -1051,12 +1358,180 @@ function fullReset(){
   $('upload-view').classList.remove('exit');
   $('editor-view').classList.remove('active');
   fi.value='';
+  updateCopyPasteBtns();
 }
 
 $('new-btn').addEventListener('click',()=>S.img?openModal('confirm-ov'):null);
 $('mob-new').addEventListener('click',()=>{closeModal('more-ov');S.img?openModal('confirm-ov'):null;});
 $('conf-cancel').addEventListener('click',()=>closeModal('confirm-ov'));
-$('conf-ok').addEventListener('click',()=>{closeModal('confirm-ov');fullReset();});
+$('conf-ok').addEventListener('click',()=>{closeModal('confirm-ov');exitFolderMode();fullReset();});
+
+/* ══════════════════════════════════════════════════
+   FOLDER MODE
+══════════════════════════════════════════════════ */
+const FOLDER={active:false,files:[],editIdx:-1,viewIdx:-1,pendingIdx:-1,pendingTool:null,previewing:false,MAX:50};
+
+function enterFolderMode(imageFiles){
+  const files=imageFiles.slice(0,FOLDER.MAX);
+  if(!files.length){showToast('No supported images found');return;}
+  if(imageFiles.length>FOLDER.MAX)showToast('Showing first '+FOLDER.MAX+' images');
+  FOLDER.active=true;FOLDER.files=files;FOLDER.editIdx=0;FOLDER.viewIdx=0;FOLDER.previewing=false;
+  $('folder-strip').classList.add('active');
+  buildFolderThumbs();
+  loadFolderImage(0);
+}
+
+function exitFolderMode(){
+  FOLDER.active=false;FOLDER.files=[];FOLDER.editIdx=-1;FOLDER.viewIdx=-1;FOLDER.pendingIdx=-1;FOLDER.pendingTool=null;FOLDER.previewing=false;
+  $('folder-strip').classList.remove('active');
+  $('fs-list').innerHTML='';
+}
+
+function buildFolderThumbs(){
+  const list=$('fs-list');list.innerHTML='';
+  FOLDER.files.forEach((f,i)=>{
+    const div=document.createElement('div');
+    div.className='fs-thumb'+(i===FOLDER.editIdx?' editing':'')+(i===FOLDER.viewIdx?' active':'');
+    div.dataset.idx=i;
+    const img=document.createElement('img');
+    img.src=URL.createObjectURL(f);
+    img.onload=()=>{};
+    const name=document.createElement('div');
+    name.className='fs-name';
+    name.textContent=f.name.length>12?f.name.slice(0,10)+'...':f.name;
+    name.title=f.name;
+    div.appendChild(img);div.appendChild(name);
+    div.addEventListener('click',()=>previewFolderImage(i));
+    list.appendChild(div);
+  });
+}
+
+function updateFolderHighlights(){
+  document.querySelectorAll('.fs-thumb').forEach((t,i)=>{
+    t.classList.toggle('editing',i===FOLDER.editIdx);
+    t.classList.toggle('active',i===FOLDER.viewIdx);
+  });
+  const viewed=document.querySelector('.fs-thumb.active');
+  if(viewed)viewed.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});
+}
+
+function previewFolderImage(idx){
+  if(idx===FOLDER.viewIdx)return;
+  FOLDER.viewIdx=idx;
+  updateFolderHighlights();
+  if(idx===FOLDER.editIdx){
+    // Back to the editing image — restore rendered view
+    FOLDER.previewing=false;
+    render();
+    return;
+  }
+  // Preview another image raw (no edits)
+  FOLDER.previewing=true;
+  const file=FOLDER.files[idx];
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=()=>{
+    // Draw raw preview on canvas without touching S
+    const dpr=window.devicePixelRatio||1;
+    const pad=18;
+    const mxW=cwEl.clientWidth-pad,mxH=cwEl.clientHeight-pad;
+    if(mxW<=0||mxH<=0)return;
+    const scale=Math.min(mxW/img.width,mxH/img.height,1);
+    const cssW=Math.max(1,Math.round(img.width*scale));
+    const cssH=Math.max(1,Math.round(img.height*scale));
+    pcEl.width=Math.round(cssW*dpr);pcEl.height=Math.round(cssH*dpr);
+    pcEl.style.width=cssW+'px';pcEl.style.height=cssH+'px';
+    pcEl.style.filter='none';
+    const px=pcEl.getContext('2d');
+    px.save();px.scale(dpr,dpr);px.clearRect(0,0,cssW,cssH);
+    px.imageSmoothingEnabled=true;px.imageSmoothingQuality='high';
+    px.drawImage(img,0,0,cssW,cssH);
+    px.restore();
+    URL.revokeObjectURL(url);
+  };
+  img.onerror=()=>{showToast('Could not load image');URL.revokeObjectURL(url);};
+  img.src=url;
+}
+
+/* Called when user tries to edit while previewing a different image */
+function checkPreviewBeforeEdit(toolName){
+  if(!FOLDER.active||!FOLDER.previewing)return false;
+  FOLDER.pendingIdx=FOLDER.viewIdx;
+  FOLDER.pendingTool=toolName||null;
+  openModal('switch-ov');
+  return true; // blocked
+}
+
+function loadFolderImage(idx,onReady){
+  if(idx<0||idx>=FOLDER.files.length)return;
+  const file=FOLDER.files[idx];
+  FOLDER.editIdx=idx;FOLDER.viewIdx=idx;FOLDER.previewing=false;
+  updateFolderHighlights();
+  if(S.cropActive)exitCropMode(false);
+  S.texts=[];S.selTxt=-1;
+  S.crop={x:0,y:0,w:0,h:0};S.cropDraft={...S.crop};S.cropRatio='free';
+  S.ex={all:0,t:0,b:0,l:0,r:0,col:'white',ind:false,inAll:0,inT:0,inB:0,inL:0,inR:0,inInd:false};
+  S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};
+  S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false};
+  S.adj={br:0,co:0,sa:0,ex:0,sh:0};adjImgCache=null;
+  document.querySelectorAll('.cp-prb').forEach(b=>b.classList.toggle('active',b.dataset.ratio==='free'));
+  document.querySelectorAll('[data-expratio]').forEach(b=>b.classList.toggle('active',b.dataset.expratio==='none'));
+  const url=URL.createObjectURL(file);
+  const img=new Image();
+  img.onload=()=>{
+    S.img=img;S.iw=img.width;S.ih=img.height;
+    S.crop={x:0,y:0,w:S.iw,h:S.ih};S.cropDraft={...S.crop};
+    invalidateGrainCache();loadedFonts.clear();adjImgCache=null;
+    URL.revokeObjectURL(url);
+    showEditor();syncAllUI();render();initHistory();
+    closePanelMob();setTool(null);
+    if(onReady)onReady();
+  };
+  img.onerror=()=>showToast('Could not load image');
+  img.src=url;
+}
+
+$('switch-cancel').addEventListener('click',()=>{
+  closeModal('switch-ov');FOLDER.pendingIdx=-1;FOLDER.pendingTool=null;
+  FOLDER.viewIdx=FOLDER.editIdx;FOLDER.previewing=false;
+  updateFolderHighlights();render();
+});
+$('switch-ok').addEventListener('click',()=>{
+  closeModal('switch-ov');
+  const tool=FOLDER.pendingTool;
+  if(FOLDER.pendingIdx>=0)loadFolderImage(FOLDER.pendingIdx,()=>{if(tool)setTool(tool);});
+  FOLDER.pendingIdx=-1;FOLDER.pendingTool=null;
+});
+
+/* Folder drop detection on drop zone */
+function collectDroppedImages(dt){
+  const files=[];
+  for(let i=0;i<dt.files.length;i++){
+    if(isImageFile(dt.files[i]))files.push(dt.files[i]);
+  }
+  return files;
+}
+
+/* Folder open button */
+$('folder-btn').addEventListener('click',()=>$('folder-fi').click());
+$('folder-fi').addEventListener('change',e=>{
+  const files=[...e.target.files].filter(isImageFile);
+  if(files.length)enterFolderMode(files);
+  e.target.value='';
+});
+
+/* Add more images button */
+$('fs-add').addEventListener('click',()=>$('add-fi').click());
+$('add-fi').addEventListener('change',e=>{
+  const newFiles=[...e.target.files].filter(isImageFile);
+  const space=FOLDER.MAX-FOLDER.files.length;
+  if(space<=0){showToast('Max '+FOLDER.MAX+' images reached');e.target.value='';return;}
+  const toAdd=newFiles.slice(0,space);
+  if(newFiles.length>space)showToast('Added '+toAdd.length+' (limit '+FOLDER.MAX+')');
+  FOLDER.files.push(...toAdd);
+  buildFolderThumbs();
+  e.target.value='';
+});
 
 /* ── Reset Edits (keep image) ── */
 function resetEdits(){
@@ -1065,7 +1540,7 @@ function resetEdits(){
   S.texts=[];S.selTxt=-1;
   S.crop={x:0,y:0,w:S.iw,h:S.ih};S.cropDraft={...S.crop};S.cropRatio='free';
   S.ex={all:0,t:0,b:0,l:0,r:0,col:'white',ind:false,inAll:0,inT:0,inB:0,inL:0,inR:0,inInd:false};
-  S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0};
+  S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false};
   S.adj={br:0,co:0,sa:0,ex:0,sh:0};adjImgCache=null;
   document.querySelectorAll('.cp-prb').forEach(b=>b.classList.toggle('active',b.dataset.ratio==='free'));
   syncAllUI();render();initHistory();
@@ -1079,6 +1554,7 @@ const TOOLS=['adjust','crop','expand','corners','text','grain','fade'];
 const isMob=()=>window.innerWidth<=600;
 
 function setTool(name){
+  if(checkPreviewBeforeEdit(name))return;
   if(name==='crop'){
     if(S.tool==='crop'&&S.cropActive){exitCropMode(false);S.tool=null;highlightTool(null);showPanel(null);if(isMob())closePanelMob();return;}
     S.tool=name;highlightTool(name);showPanel(name);
@@ -1664,6 +2140,71 @@ $('crop-reset').addEventListener('click',()=>{S.crop={x:0,y:0,w:S.iw,h:S.ih};S.c
 /* ══════════════════════════════════════════════════
    EXPAND CONTROLS
 ══════════════════════════════════════════════════ */
+
+/* ── Expand Presets ── */
+function applyExpandPreset(ratio){
+  if(!S.img||ratio==='none'){
+    // Reset expand to 0
+    S.ex.all=0;S.ex.t=S.ex.b=S.ex.l=S.ex.r=0;
+    S.ex.ind=false;
+    $('e-ind').checked=false;
+    $('e-sides').style.display='none';$('e-master').style.display='';
+    syncExV();syncAllUI();render();pushSnapNow();
+    return;
+  }
+  const [rw,rh]=ratio.split(':').map(Number);
+  const targetAR=rw/rh;
+  const cw=Math.max(1,S.crop.w||S.iw);
+  const ch=Math.max(1,S.crop.h||S.ih);
+  const imgAR=cw/ch;
+  const ZOOM_PAD=0.08; // 8% padding when ratio already matches
+  const EPS=0.01;
+
+  let addT=0,addB=0,addL=0,addR=0;
+
+  if(Math.abs(imgAR-targetAR)<EPS){
+    // Already matches — zoom out: add uniform padding
+    const pad=Math.round(Math.max(cw,ch)*ZOOM_PAD);
+    addT=pad;addB=pad;addL=pad;addR=pad;
+    // After adding uniform padding the ratio may shift, correct it
+    const newW=cw+addL+addR, newH=ch+addT+addB;
+    const newAR=newW/newH;
+    if(newAR>targetAR+EPS){
+      const extraH=Math.round(newW/targetAR-newH);
+      addT+=Math.floor(extraH/2);addB+=Math.ceil(extraH/2);
+    }else if(newAR<targetAR-EPS){
+      const extraW=Math.round(newH*targetAR-newW);
+      addL+=Math.floor(extraW/2);addR+=Math.ceil(extraW/2);
+    }
+  }else if(imgAR>targetAR){
+    // Image is wider than target — need to expand top/bottom
+    const needH=Math.round(cw/targetAR)-ch;
+    addT=Math.floor(needH/2);addB=Math.ceil(needH/2);
+  }else{
+    // Image is taller than target — need to expand left/right
+    const needW=Math.round(ch*targetAR)-cw;
+    addL=Math.floor(needW/2);addR=Math.ceil(needW/2);
+  }
+
+  // Apply as individual sides
+  S.ex.ind=true;S.ex.t=addT;S.ex.b=addB;S.ex.l=addL;S.ex.r=addR;
+  S.ex.all=0;
+  $('e-ind').checked=true;
+  $('e-sides').style.display='flex';$('e-master').style.display='none';
+  ['t','bo','l','r'].forEach(s=>{
+    const k=s==='bo'?'b':s;
+    $('e-'+s).value=S.ex[k];
+  });
+  syncExV();syncAllUI();render();pushSnapNow();
+}
+
+$('exp-presets').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-expratio]');if(!btn)return;
+  document.querySelectorAll('[data-expratio]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyExpandPreset(btn.dataset.expratio);
+});
+
 function syncExV(){
   if(S.ex.ind){
     ['t','bo','l','r'].forEach(s=>{const k=s==='bo'?'b':s;$('e-'+s+'-v').textContent=S.ex[k]+' px';});
@@ -1671,10 +2212,10 @@ function syncExV(){
     $('e-all-v').textContent=S.ex.all+' px';
   }
 }
-$('e-all').addEventListener('input',function(){S.ex.all=+this.value;if(!S.ex.ind)S.ex.t=S.ex.b=S.ex.l=S.ex.r=S.ex.all;syncExV();render();});
+$('e-all').addEventListener('input',function(){S.ex.all=+this.value;if(!S.ex.ind)S.ex.t=S.ex.b=S.ex.l=S.ex.r=S.ex.all;syncExV();render();document.querySelectorAll('[data-expratio]').forEach(b=>b.classList.remove('active'));});
 $('e-all').addEventListener('change',()=>pushSnapNow());
 ['t','bo','l','r'].forEach(s=>{
-  $('e-'+s).addEventListener('input',function(){const k=s==='bo'?'b':s;S.ex[k]=+this.value;syncExV();render();});
+  $('e-'+s).addEventListener('input',function(){const k=s==='bo'?'b':s;S.ex[k]=+this.value;syncExV();render();document.querySelectorAll('[data-expratio]').forEach(b=>b.classList.remove('active'));});
   $('e-'+s).addEventListener('change',()=>pushSnapNow());
 });
 $('e-ind').addEventListener('change',function(){
@@ -1766,7 +2307,7 @@ buildColorPicker('txt-color-row',c=>{
 
 function mkTextLayer(){
   const id=++textIdCounter;
-  S.texts.push({id,str:'',pos:'mc',off:40,sz:72,wt:'400',col:'#ffffff',fnt:'Quicksand'});
+  S.texts.push({id,str:'',pos:'mc',off:40,sz:72,wt:'400',col:'#ffffff',fnt:'Quicksand',dx:0,dy:0});
   S.selTxt=S.texts.length-1;
   rebuildTxtList();syncTxtControls();render();pushSnapNow();
 }
@@ -1821,10 +2362,10 @@ function syncTxtControls(){
   $('layer-controls').style.display='flex';
   const L=S.texts[S.selTxt];
   $('txt').value=L.str;
-  $('tof').value=L.off;$('tof-v').textContent=L.off+' px';
   $('tsz').value=L.sz;$('tsz-v').textContent=L.sz+' px';
   document.querySelectorAll('[data-tw]').forEach(b=>b.classList.toggle('active',b.dataset.tw===L.wt));
   document.querySelectorAll('[data-pos]').forEach(b=>b.classList.toggle('active',b.dataset.pos===L.pos));
+  $('txt-pos-v').textContent=(L.dx||0)+', '+(L.dy||0);
   document.querySelectorAll('[data-tf]').forEach(o=>o.classList.toggle('active',o.dataset.tf===L.fnt));
   updateColorPicker('txt-color-row',L.col||'#ffffff');
 }
@@ -1832,13 +2373,40 @@ function syncTxtControls(){
 $('add-layer-btn').addEventListener('click',mkTextLayer);
 $('txt').addEventListener('input',function(){if(S.selTxt<0)return;S.texts[S.selTxt].str=this.value;rebuildTxtList();render();snapLater();});
 $('txt').addEventListener('change',()=>pushSnapNow());
-$('tof').addEventListener('input',function(){if(S.selTxt<0)return;S.texts[S.selTxt].off=+this.value;$('tof-v').textContent=this.value+' px';render();});
-$('tof').addEventListener('change',()=>pushSnapNow());
 $('tsz').addEventListener('input',function(){if(S.selTxt<0)return;S.texts[S.selTxt].sz=+this.value;$('tsz-v').textContent=this.value+' px';render();});
 $('tsz').addEventListener('change',()=>pushSnapNow());
 document.querySelectorAll('[data-tw]').forEach(btn=>{btn.addEventListener('click',()=>{if(S.selTxt<0)return;document.querySelectorAll('[data-tw]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');S.texts[S.selTxt].wt=btn.dataset.tw;render();pushSnapNow();});});
-document.querySelectorAll('[data-pos]').forEach(btn=>{btn.addEventListener('click',()=>{if(S.selTxt<0)return;document.querySelectorAll('[data-pos]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');S.texts[S.selTxt].pos=btn.dataset.pos;render();pushSnapNow();});});
+document.querySelectorAll('[data-pos]').forEach(btn=>{btn.addEventListener('click',()=>{if(S.selTxt<0)return;document.querySelectorAll('[data-pos]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');S.texts[S.selTxt].pos=btn.dataset.pos;S.texts[S.selTxt].dx=0;S.texts[S.selTxt].dy=0;$('txt-pos-v').textContent='0, 0';render();pushSnapNow();});});
 document.querySelectorAll('[data-tf]').forEach(opt=>{opt.addEventListener('click',()=>{if(S.selTxt<0)return;document.querySelectorAll('[data-tf]').forEach(o=>o.classList.remove('active'));opt.classList.add('active');S.texts[S.selTxt].fnt=opt.dataset.tf;render();pushSnapNow();});});
+
+/* ── Text Arrow Move ── */
+const ARROW_STEP=10;
+function moveText(dir){
+  if(S.selTxt<0||S.selTxt>=S.texts.length)return;
+  const L=S.texts[S.selTxt];
+  if(!('dx' in L)){L.dx=0;L.dy=0;}
+  if(dir==='up')L.dy-=ARROW_STEP;
+  else if(dir==='down')L.dy+=ARROW_STEP;
+  else if(dir==='left')L.dx-=ARROW_STEP;
+  else if(dir==='right')L.dx+=ARROW_STEP;
+  $('txt-pos-v').textContent=L.dx+', '+L.dy;
+  render();snapLater();
+}
+document.querySelectorAll('[data-arrow]').forEach(btn=>{
+  btn.addEventListener('click',()=>moveText(btn.dataset.arrow));
+});
+$('arrow-reset').addEventListener('click',()=>{
+  if(S.selTxt<0||S.selTxt>=S.texts.length)return;
+  S.texts[S.selTxt].dx=0;S.texts[S.selTxt].dy=0;
+  $('txt-pos-v').textContent='0, 0';
+  render();pushSnapNow();
+});
+document.addEventListener('keydown',e=>{
+  if(S.tool!=='text'||S.selTxt<0)return;
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+  const map={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+  if(map[e.key]){e.preventDefault();moveText(map[e.key]);}
+});
 
 /* ── Grain ── */
 $('gr').addEventListener('input',function(){S.gr.val=+this.value;$('gr-v').textContent=this.value+'%';invalidateGrainCache();render();});
@@ -1866,6 +2434,7 @@ $('fd-str').addEventListener('input',function(){S.fd.str=+this.value;$('fd-str-v
 $('fd-str').addEventListener('change',()=>pushSnapNow());
 $('fd-blur').addEventListener('input',function(){S.fd.blur=+this.value;$('fd-blur-v').textContent=this.value+' px';render();});
 $('fd-blur').addEventListener('change',()=>pushSnapNow());
+$('fd-border').addEventListener('change',function(){S.fd.border=this.checked;render();pushSnapNow();});
 
 /* ══════════════════════════════════════════════════
    FADE / GRADIENT OVERLAY
@@ -1933,7 +2502,12 @@ async function doRender(canvas,ctx){
   const adjSrc=buildAdjustedImage(canvas,ctx,S.crop.x,S.crop.y,cw2,ch2);
 
   const outerR=S.rc.ind?S.rc.outerR:S.rc.r;
-  const innerR=S.rc.ind?S.rc.innerR:S.rc.r;
+  let innerR=S.rc.ind?S.rc.innerR:S.rc.r;
+  // Auto-calculate inner radius when expand is active and NOT in individual mode
+  if(hasExpand()&&outerR>0&&!S.rc.ind){
+    const gap=Math.min(t,b,l,r);
+    innerR=Math.max(0,outerR-gap);
+  }
   const clampOuter=Math.min(outerR,W/2,H/2);
   const clampInner=Math.min(innerR,cw2/2,ch2/2);
 
@@ -1963,16 +2537,23 @@ async function doRender(canvas,ctx){
     if(inR>0)ctx.fillRect(l+cw2-Math.min(inR,cw2),t,Math.min(inR,cw2),ch2);
   }
 
-  // Fade overlay
+  // Fade overlay (clipped to image unless "Apply to border" is on)
+  if(!S.fd.border){ctx.save();ctx.beginPath();ctx.rect(l,t,cw2,ch2);ctx.clip();}
   renderFade(ctx,W,H,S.img,S.crop.x,S.crop.y,cw2,ch2,l,t);
+  if(!S.fd.border)ctx.restore();
 
   // Text layers
   for(const layer of S.texts){
     if(layer.str&&layer.str.trim())await renderTextLayer(ctx,layer,W,H);
   }
 
-  // Grain
-  if(S.gr.val>0)renderGrain(ctx,W,H,S.gr.val,S.gr.sz);
+  // Grain (image area only)
+  if(S.gr.val>0){
+    ctx.save();
+    ctx.beginPath();ctx.rect(l,t,cw2,ch2);ctx.clip();
+    renderGrain(ctx,W,H,S.gr.val,S.gr.sz);
+    ctx.restore();
+  }
 
   ctx.restore();
 }
@@ -2010,6 +2591,7 @@ async function renderTextLayer(ctx,layer,W,H){
     default:x=xC;y=yM;align='center';
   }
   ctx.textAlign=align;
+  x+=(layer.dx||0);y+=(layer.dy||0);
   lines.forEach((ln,i)=>ctx.fillText(ln,x,y+i*lh));
   ctx.restore();
 }
@@ -2017,7 +2599,7 @@ async function renderTextLayer(ctx,layer,W,H){
 /* ── Service Worker (PWA) ── */
 if('serviceWorker' in navigator && location.protocol !== 'file:'){
   const swSrc=`
-const CACHE='imgbynan-v4';
+const CACHE='imgbynan-v4.2.1';
 const ASSETS=[location.href];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.add('/')).catch(()=>{}));
@@ -2268,6 +2850,10 @@ document.addEventListener('keydown',e=>{
 /* ── SyncAllUI ── */
 function syncAllUI(){
   // Expand
+  // Reset preset highlight if all expand is 0
+  if(S.ex.t===0&&S.ex.b===0&&S.ex.l===0&&S.ex.r===0&&S.ex.all===0){
+    document.querySelectorAll('[data-expratio]').forEach(b=>b.classList.toggle('active',b.dataset.expratio==='none'));
+  }
   $('e-ind').checked=S.ex.ind;
   $('e-sides').style.display=S.ex.ind?'flex':'none';
   $('e-master').style.display=S.ex.ind?'none':'';
@@ -2299,6 +2885,7 @@ function syncAllUI(){
   $('fd-len').value=S.fd.len;$('fd-len-v').textContent=S.fd.len+'%';
   $('fd-str').value=S.fd.str;$('fd-str-v').textContent=S.fd.str+'%';
   $('fd-blur').value=S.fd.blur;$('fd-blur-v').textContent=S.fd.blur+' px';
+  $('fd-border').checked=!!S.fd.border;
   // Text
   rebuildTxtList();if(S.selTxt>=0&&S.selTxt<S.texts.length)syncTxtControls();
   // Adjustments
@@ -2311,6 +2898,21 @@ function showToast(msg){
   const t=$('toast');t.textContent=msg;t.classList.add('show');
   clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600);
 }
+/* ── Disclaimer ── */
+$('disc-open').addEventListener('click',()=>openModal('disc-ov'));
+$('disc-close').addEventListener('click',()=>closeModal('disc-ov'));
+updateCopyPasteBtns();
+
+/* ── Clock ── */
+(function(){
+  const el=$('hdr-clock');
+  function tick(){
+    const d=new Date();
+    el.textContent=[d.getHours(),d.getMinutes(),d.getSeconds()].map(v=>String(v).padStart(2,'0')).join(':');
+  }
+  tick();
+  setInterval(tick,1000);
+})();
 </script>
 </body>
 </html>
