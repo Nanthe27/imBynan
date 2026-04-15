@@ -483,6 +483,17 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .disc-fb-btn:hover{opacity:.85}
 
 /* Toast */
+/* Photo Presets */
+.adj-presets-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.adj-preset-btn{padding:7px 4px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:'Quicksand',sans-serif;font-weight:600;font-size:.68rem;cursor:pointer;transition:all var(--t);text-align:center}
+.adj-preset-btn:hover{background:var(--bg4);color:var(--text);border-color:var(--border2)}
+.adj-preset-btn.active{background:var(--act);color:var(--actT);border-color:transparent}
+.adj-preset-btn:active{transform:scale(.95)}
+/* Flip / Rotate */
+.flip-rot-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.flip-rot-btn{padding:7px 4px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:'Quicksand',sans-serif;font-weight:600;font-size:.63rem;cursor:pointer;transition:all var(--t);text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}
+.flip-rot-btn:hover{background:var(--bg4);color:var(--text);border-color:var(--border2)}
+.flip-rot-btn:active{transform:scale(.93)}
 .toast{position:fixed;bottom:82px;left:50%;translate:-50% 14px;background:var(--act);color:var(--actT);padding:8px 20px;border-radius:22px;font-family:'Quicksand',sans-serif;font-weight:700;font-size:.8rem;z-index:200;opacity:0;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.35);transition:all .3s var(--spring)}
 .toast.show{opacity:1;translate:-50% 0}
 
@@ -678,6 +689,44 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
           <div class="cl">Sharpness <span class="cv" id="adj-sh-v">0</span></div>
           <input type="range" id="adj-sh" min="0" max="100" value="0">
         </div>
+        <div class="cg">
+          <div class="cl">Blur <span class="cv" id="adj-bl-v">0</span></div>
+          <input type="range" id="adj-bl" min="0" max="100" value="0">
+        </div>
+        <div class="cg">
+          <div class="cl">Hue <span class="cv" id="adj-hu-v">0</span></div>
+          <input type="range" id="adj-hu" min="-180" max="180" value="0">
+        </div>
+        <div class="cg">
+          <div class="cl">Temperature <span class="cv" id="adj-te-v">0</span></div>
+          <input type="range" id="adj-te" min="-100" max="100" value="0">
+        </div>
+        <div class="cg">
+          <div class="cl">Tint <span class="cv" id="adj-ti-v">0</span></div>
+          <input type="range" id="adj-ti" min="-100" max="100" value="0">
+        </div>
+        <div class="cg">
+          <div class="cl">Highlights <span class="cv" id="adj-hl-v">0</span></div>
+          <input type="range" id="adj-hl" min="-100" max="100" value="0">
+        </div>
+        <div class="cg">
+          <div class="cl">Shadows <span class="cv" id="adj-sd-v">0</span></div>
+          <input type="range" id="adj-sd" min="-100" max="100" value="0">
+        </div>
+        <div class="cg">
+          <div class="cl">Presets</div>
+          <div class="adj-presets-grid" id="adj-presets">
+            <button class="adj-preset-btn active" data-preset="original">Original</button>
+            <button class="adj-preset-btn" data-preset="warm">Warm</button>
+            <button class="adj-preset-btn" data-preset="cool">Cool</button>
+            <button class="adj-preset-btn" data-preset="vivid">Vivid</button>
+            <button class="adj-preset-btn" data-preset="matte">Matte</button>
+            <button class="adj-preset-btn" data-preset="bw">B&amp;W</button>
+            <button class="adj-preset-btn" data-preset="faded">Faded</button>
+            <button class="adj-preset-btn" data-preset="moody">Moody</button>
+            <button class="adj-preset-btn" data-preset="golden">Golden</button>
+          </div>
+        </div>
         <button class="adj-reset-btn" id="adj-reset-btn">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           Reset Adjustments
@@ -701,6 +750,23 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
           </div>
         </div>
         <div class="crop-hint" id="crop-hint">Drag corners or edges to crop. Drag inside frame to move it.</div>
+        <div class="cg">
+          <div class="cl">Flip &amp; Rotate</div>
+          <div class="flip-rot-row">
+            <button class="flip-rot-btn" id="btn-flip-h">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18"/><path d="M4 8l-3 4 3 4"/><path d="M20 8l3 4-3 4"/></svg>Flip H
+            </button>
+            <button class="flip-rot-btn" id="btn-flip-v">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18"/><path d="M8 4l4-3 4 3"/><path d="M8 20l4 3 4-3"/></svg>Flip V
+            </button>
+            <button class="flip-rot-btn" id="btn-rot-cw">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/></svg>CW 90°
+            </button>
+            <button class="flip-rot-btn" id="btn-rot-ccw">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"/><path d="M21 12a9 9 0 0 0-15-6.7L3 8"/></svg>CCW 90°
+            </button>
+          </div>
+        </div>
         <div class="crop-actions" id="crop-actions" style="display:none">
           <button class="cr-btn" id="crop-cancel">Cancel</button>
           <button class="cr-btn pri" id="crop-apply">Apply Crop</button>
@@ -918,6 +984,18 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
           <div class="chkb"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
           <span class="chk-lbl">Apply to border</span>
         </label>
+        <div class="s-div" style="margin:4px 0"></div>
+        <div class="cg">
+          <div class="cl">Vignette <span class="cv" id="fd-vig-v">0%</span></div>
+          <input type="range" id="fd-vig" min="0" max="100" value="0">
+        </div>
+        <div class="cg">
+          <div class="cl">Vignette Color</div>
+          <div class="seg">
+            <button class="seg-b active" data-vigcol="dark">Dark</button>
+            <button class="seg-b" data-vigcol="light">Light</button>
+          </div>
+        </div>
       </div>
 
     </div><!-- /tool-panel -->
@@ -1167,8 +1245,8 @@ let S={
   texts:[], selTxt:-1,
   gr:{val:0,sz:1},
   rc:{r:0,outerR:0,innerR:0,ind:false},
-  fd:{top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false},
-  adj:{br:0,co:0,sa:0,ex:0,sh:0},
+  fd:{top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false,vig:0,vigCol:'dark'},
+  adj:{br:0,co:0,sa:0,ex:0,sh:0,te:0,ti:0,hl:0,sd:0,bl:0,hu:0},
 };
 let textIdCounter=0;
 
@@ -1248,8 +1326,8 @@ function applyPastedEdits(){
     S.crop={x:0,y:0,w:0,h:0};S.cropDraft={...S.crop};S.cropRatio='free';
     S.ex={all:0,t:0,b:0,l:0,r:0,col:'white',ind:false,inAll:0,inT:0,inB:0,inL:0,inR:0,inInd:false};
     S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};
-    S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false};
-    S.adj={br:0,co:0,sa:0,ex:0,sh:0};adjImgCache=null;
+    S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false,vig:0,vigCol:'dark'};
+    S.adj={br:0,co:0,sa:0,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:0,sd:0};adjImgCache=null;
     const url=URL.createObjectURL(file);
     const img=new Image();
     img.onload=()=>{
@@ -1350,8 +1428,8 @@ function fullReset(){
   S.texts=[];S.selTxt=-1;
   S.crop={x:0,y:0,w:0,h:0};S.cropDraft={...S.crop};S.cropRatio='free';
   S.ex={all:0,t:0,b:0,l:0,r:0,col:'white',ind:false,inAll:0,inT:0,inB:0,inL:0,inR:0,inInd:false};
-  S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false};
-  S.adj={br:0,co:0,sa:0,ex:0,sh:0};
+  S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false,vig:0,vigCol:'dark'};
+  S.adj={br:0,co:0,sa:0,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:0,sd:0};
   adjImgCache=null;
   H.stack=[];H.idx=-1;updUR();
   closePanelMob();setTool(null);syncAllUI();
@@ -1472,8 +1550,8 @@ function loadFolderImage(idx,onReady){
   S.crop={x:0,y:0,w:0,h:0};S.cropDraft={...S.crop};S.cropRatio='free';
   S.ex={all:0,t:0,b:0,l:0,r:0,col:'white',ind:false,inAll:0,inT:0,inB:0,inL:0,inR:0,inInd:false};
   S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};
-  S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false};
-  S.adj={br:0,co:0,sa:0,ex:0,sh:0};adjImgCache=null;
+  S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false,vig:0,vigCol:'dark'};
+  S.adj={br:0,co:0,sa:0,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:0,sd:0};adjImgCache=null;
   document.querySelectorAll('.cp-prb').forEach(b=>b.classList.toggle('active',b.dataset.ratio==='free'));
   document.querySelectorAll('[data-expratio]').forEach(b=>b.classList.toggle('active',b.dataset.expratio==='none'));
   const url=URL.createObjectURL(file);
@@ -1540,8 +1618,8 @@ function resetEdits(){
   S.texts=[];S.selTxt=-1;
   S.crop={x:0,y:0,w:S.iw,h:S.ih};S.cropDraft={...S.crop};S.cropRatio='free';
   S.ex={all:0,t:0,b:0,l:0,r:0,col:'white',ind:false,inAll:0,inT:0,inB:0,inL:0,inR:0,inInd:false};
-  S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false};
-  S.adj={br:0,co:0,sa:0,ex:0,sh:0};adjImgCache=null;
+  S.gr={val:0,sz:1};S.rc={r:0,outerR:0,innerR:0,ind:false};S.fd={top:false,bot:false,left:false,right:false,col:'black',len:30,str:85,blur:0,border:false,vig:0,vigCol:'dark'};
+  S.adj={br:0,co:0,sa:0,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:0,sd:0};adjImgCache=null;
   document.querySelectorAll('.cp-prb').forEach(b=>b.classList.toggle('active',b.dataset.ratio==='free'));
   syncAllUI();render();initHistory();
 }
@@ -1625,32 +1703,72 @@ void main(){
 const FS_ADJ=`#version 300 es
 precision highp float;
 uniform sampler2D u_tex;
-uniform float u_brightness; // additive offset in [0,1] space: br/100
-uniform float u_contrast;   // multiplier around 0.5: (100+co)/100
-uniform float u_saturation; // (100+sa)/100
-uniform float u_exposure;   // multiplier: 1 + ex/100
+uniform float u_brightness;
+uniform float u_contrast;
+uniform float u_saturation;
+uniform float u_exposure;
+uniform float u_temperature;
+uniform float u_tint;
+uniform float u_highlights;
+uniform float u_shadows;
+uniform float u_hue; // hue shift in [-0.5, 0.5] (fraction of full 360° rotation)
 in vec2 v_uv;
 out vec4 fragColor;
 
 vec3 adjustRGB(vec3 c){
-  // Exposure (multiplicative)
   c *= u_exposure;
-  // Brightness (additive)
   c += u_brightness;
-  // Contrast (scale around 0.5)
   c = (c - 0.5) * u_contrast + 0.5;
   return c;
 }
-
 vec3 saturate(vec3 c, float sat){
   float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
   return mix(vec3(lum), c, sat);
+}
+
+// HSL helpers for hue rotation
+float hue2rgb(float p, float q, float t){
+  if(t<0.)t+=1.;if(t>1.)t-=1.;
+  if(t<1./6.)return p+(q-p)*6.*t;
+  if(t<.5)return q;
+  if(t<2./3.)return p+(q-p)*(2./3.-t)*6.;
+  return p;
+}
+vec3 rgb2hsl(vec3 c){
+  float mx=max(c.r,max(c.g,c.b)),mn=min(c.r,min(c.g,c.b));
+  float d=mx-mn,l=(mx+mn)*.5,h=0.,s=0.;
+  if(d>.00001){
+    s=l<.5?d/(mx+mn):d/(2.-mx-mn);
+    if(mx==c.r)h=mod((c.g-c.b)/d,6.)/6.;
+    else if(mx==c.g)h=((c.b-c.r)/d+2.)/6.;
+    else h=((c.r-c.g)/d+4.)/6.;
+  }
+  return vec3(h,s,l);
+}
+vec3 hsl2rgb(vec3 hsl){
+  float h=hsl.x,s=hsl.y,l=hsl.z;
+  if(s<.00001)return vec3(l);
+  float q=l<.5?l*(1.+s):l+s-l*s,p=2.*l-q;
+  return vec3(hue2rgb(p,q,h+1./3.),hue2rgb(p,q,h),hue2rgb(p,q,h-1./3.));
 }
 
 void main(){
   vec4 s = texture(u_tex, v_uv);
   vec3 c = adjustRGB(s.rgb);
   c = saturate(c, u_saturation);
+  c.r = clamp(c.r + u_temperature * 0.3, 0.0, 1.0);
+  c.b = clamp(c.b - u_temperature * 0.3, 0.0, 1.0);
+  c.g = clamp(c.g + u_tint * 0.15, 0.0, 1.0);
+  float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
+  float hlMask = smoothstep(0.5, 1.0, lum);
+  float sdMask = 1.0 - smoothstep(0.0, 0.55, lum);
+  c = clamp(c + u_highlights * 0.5 * hlMask, 0.0, 1.0);
+  c = clamp(c + u_shadows    * 0.5 * sdMask, 0.0, 1.0);
+  if(abs(u_hue) > 0.001){
+    vec3 hsl = rgb2hsl(c);
+    hsl.x = fract(hsl.x + u_hue);
+    c = hsl2rgb(hsl);
+  }
   fragColor = vec4(clamp(c, 0.0, 1.0), s.a);
 }`;
 
@@ -1764,9 +1882,13 @@ function glDraw(gl, prog){
 let adjImgCache=null;
 let adjImgCacheKey='';
 
+/* Reusable canvases for buildAdjustedImage — avoids per-frame allocation */
+let _cropBuf=null,_cropBufW=0,_cropBufH=0;
+let _adjOut=null,_adjOutW=0,_adjOutH=0;
+
 function getAdjKey(){
   const a=S.adj;
-  return`${a.br},${a.co},${a.sa},${a.ex},${a.sh}`;
+  return`${a.br},${a.co},${a.sa},${a.ex},${a.sh},${a.te},${a.ti},${a.hl},${a.sd},${a.hu||0},${a.bl||0}`;
 }
 
 /* Main GPU render function — processes adjustments on WebGL2 */
@@ -1775,7 +1897,7 @@ function buildAdjustedImage(srcCanvas,srcCtx,cropX,cropY,cropW,cropH){
   if(adjImgCache&&adjImgCacheKey===key)return adjImgCache;
 
   const a=S.adj;
-  const noAdj=a.br===0&&a.co===0&&a.sa===0&&a.ex===0&&a.sh===0;
+  const noAdj=a.br===0&&a.co===0&&a.sa===0&&a.ex===0&&a.sh===0&&a.te===0&&a.ti===0&&a.hl===0&&a.sd===0&&(a.hu||0)===0&&(a.bl||0)===0;
 
   /* Fast path: no adjustments, just crop directly */
   if(noAdj){
@@ -1795,16 +1917,18 @@ function buildAdjustedImage(srcCanvas,srcCtx,cropX,cropY,cropW,cropH){
 
     // Upload source image (cropped region) as texture
     // Draw crop onto a small temp canvas first so we can upload just the crop
-    const cropBuf=document.createElement('canvas');
-    cropBuf.width=cropW;cropBuf.height=cropH;
-    cropBuf.getContext('2d').drawImage(S.img,cropX,cropY,cropW,cropH,0,0,cropW,cropH);
+    if(!_cropBuf||_cropBufW!==cropW||_cropBufH!==cropH){
+      _cropBuf=document.createElement('canvas');_cropBufW=cropW;_cropBufH=cropH;
+    }
+    _cropBuf.width=cropW;_cropBuf.height=cropH;
+    _cropBuf.getContext('2d').drawImage(S.img,cropX,cropY,cropW,cropH,0,0,cropW,cropH);
 
-    const srcTex=glTex(GL,cropBuf);
+    const srcTex=glTex(GL,_cropBuf);
 
     /* ── Pass 1: Color adjustments ── */
     let adjTex,adjFBO;
-    if(a.sh>0){
-      // Render to FBO so we can use result in blur passes
+    const needFBO=a.sh>0||(a.bl||0)>0;
+    if(needFBO){
       ({fbo:adjFBO,tex:adjTex}=glFBO(GL,cropW,cropH));
       GL.bindFramebuffer(GL.FRAMEBUFFER,adjFBO);
     }else{
@@ -1819,10 +1943,38 @@ function buildAdjustedImage(srcCanvas,srcCtx,cropX,cropY,cropW,cropH){
     GL.uniform1f(GL.getUniformLocation(progAdj,'u_contrast'),(100+a.co)/100);
     GL.uniform1f(GL.getUniformLocation(progAdj,'u_saturation'),(100+a.sa)/100);
     GL.uniform1f(GL.getUniformLocation(progAdj,'u_exposure'),1+a.ex/100);
+    GL.uniform1f(GL.getUniformLocation(progAdj,'u_temperature'),a.te/100);
+    GL.uniform1f(GL.getUniformLocation(progAdj,'u_tint'),a.ti/100);
+    GL.uniform1f(GL.getUniformLocation(progAdj,'u_highlights'),a.hl/100);
+    GL.uniform1f(GL.getUniformLocation(progAdj,'u_shadows'),a.sd/100);
+    GL.uniform1f(GL.getUniformLocation(progAdj,'u_hue'),(a.hu||0)/360);
     glDraw(GL,progAdj);
 
-    /* ── Passes 2+3: Sharpness (blur H → blur V → unsharp mask) ── */
-    if(a.sh>0){
+    /* ── Blur passes (multi-pass separable Gaussian) ── */
+    if((a.bl||0)>0){
+      const numPasses=a.bl<=40?1:a.bl<=70?2:3;
+      const step=1+(a.bl/100)*3;
+      let blurSrc=adjTex;
+      for(let p=0;p<numPasses;p++){
+        const isLast=p===numPasses-1;
+        const{fbo:bHFBO,tex:bHTex}=glFBO(GL,cropW,cropH);
+        GL.bindFramebuffer(GL.FRAMEBUFFER,bHFBO);
+        GL.useProgram(progBlur);
+        GL.activeTexture(GL.TEXTURE0);
+        GL.bindTexture(GL.TEXTURE_2D,blurSrc);
+        GL.uniform1i(GL.getUniformLocation(progBlur,'u_tex'),0);
+        GL.uniform2f(GL.getUniformLocation(progBlur,'u_dir'),step/cropW,0);
+        glDraw(GL,progBlur);
+        if(isLast){GL.bindFramebuffer(GL.FRAMEBUFFER,null);}
+        else{const{fbo:bVFBO,tex:bVTex}=glFBO(GL,cropW,cropH);GL.bindFramebuffer(GL.FRAMEBUFFER,bVFBO);blurSrc=bVTex;}
+        GL.bindTexture(GL.TEXTURE_2D,bHTex);
+        GL.uniform2f(GL.getUniformLocation(progBlur,'u_dir'),0,step/cropH);
+        glDraw(GL,progBlur);
+      }
+    }
+
+    /* ── Sharpness (blur H → blur V → unsharp mask) ── */
+    else if(a.sh>0){
       // Blur horizontal
       const {fbo:blurHFBO,tex:blurHTex}=glFBO(GL,cropW,cropH);
       GL.bindFramebuffer(GL.FRAMEBUFFER,blurHFBO);
@@ -1857,17 +2009,19 @@ function buildAdjustedImage(srcCanvas,srcCtx,cropX,cropY,cropW,cropH){
     GL.flush();
 
     // Read result back onto a 2D canvas for compositing
-    const out=document.createElement('canvas');
-    out.width=cropW;out.height=cropH;
-    out.getContext('2d').drawImage(GL_CANVAS,0,0);
+    if(!_adjOut||_adjOutW!==cropW||_adjOutH!==cropH){
+      _adjOut=document.createElement('canvas');_adjOutW=cropW;_adjOutH=cropH;
+    }
+    _adjOut.width=cropW;_adjOut.height=cropH;
+    _adjOut.getContext('2d').drawImage(GL_CANVAS,0,0);
 
     // Cleanup textures/FBOs
     GL.deleteTexture(srcTex);
     if(adjTex)GL.deleteTexture(adjTex);
     if(adjFBO)GL.deleteFramebuffer(adjFBO);
 
-    adjImgCache=out;adjImgCacheKey=key;
-    return out;
+    adjImgCache=_adjOut;adjImgCacheKey=key;
+    return _adjOut;
   }
 
   /* CSS fallback (WebGL unavailable) — CPU LUT path */
@@ -1885,6 +2039,10 @@ function buildAdjustedImage(srcCanvas,srcCtx,cropX,cropY,cropW,cropH){
     lut[i]=Math.max(0,Math.min(255,Math.round(v)));
   }
   const satMult=(100+a.sa)/100;
+  const tempShift=a.te/100*0.3*255;
+  const tintShift=a.ti/100*0.15*255;
+  const hlStr=a.hl/100*0.5;
+  const sdStr=a.sd/100*0.5;
   for(let i=0;i<len;i+=4){
     let r=lut[d[i]],g=lut[d[i+1]],b=lut[d[i+2]];
     if(a.sa!==0){
@@ -1893,11 +2051,35 @@ function buildAdjustedImage(srcCanvas,srcCtx,cropX,cropY,cropW,cropH){
       g=Math.max(0,Math.min(255,lum+(g-lum)*satMult));
       b=Math.max(0,Math.min(255,lum+(b-lum)*satMult));
     }
+    if(a.te!==0){r=Math.max(0,Math.min(255,r+tempShift));b=Math.max(0,Math.min(255,b-tempShift));}
+    if(a.ti!==0){g=Math.max(0,Math.min(255,g+tintShift));}
+    if(a.hl!==0||a.sd!==0){
+      const lum=(0.2126*r+0.7152*g+0.0722*b)/255;
+      const t=lum<0.5?0:(lum-0.5)*2;const hlMask=t*t*(3-2*t);
+      const u=lum>0.55?0:1-(lum/0.55);const sdMask=u*u*(3-2*u);
+      const hd=hlStr*hlMask*255,sd2=sdStr*sdMask*255;
+      r=Math.max(0,Math.min(255,r+hd+sd2));
+      g=Math.max(0,Math.min(255,g+hd+sd2));
+      b=Math.max(0,Math.min(255,b+hd+sd2));
+    }
     d[i]=r;d[i+1]=g;d[i+2]=b;
   }
   tx.putImageData(id,0,0);
-  adjImgCache=tmp;adjImgCacheKey=key;
-  return tmp;
+  // Hue rotation via 2D context filter (GPU-accelerated)
+  let result=tmp;
+  if((a.hu||0)!==0){
+    const hc=document.createElement('canvas');hc.width=cropW;hc.height=cropH;
+    const hx=hc.getContext('2d');hx.filter=`hue-rotate(${a.hu}deg)`;hx.drawImage(tmp,0,0);
+    result=hc;
+  }
+  // Blur via 2D context filter
+  if((a.bl||0)>0){
+    const bc=document.createElement('canvas');bc.width=cropW;bc.height=cropH;
+    const bx=bc.getContext('2d');bx.filter=`blur(${Math.round(a.bl/100*15)}px)`;bx.drawImage(result,0,0);
+    result=bc;
+  }
+  adjImgCache=result;adjImgCacheKey=key;
+  return result;
 }
 
 /* Preview: WebGL renders live into GL_CANVAS; we copy to pcEl via drawImage.
@@ -1927,10 +2109,10 @@ function wireAdjSlider(id, key, labelId){
     S.adj[key]=+this.value;
     $(labelId).textContent=this.value;
     adjImgCache=null;
-    applyAdjPreview(); // instant CSS filter feedback
-    render();          // GPU render pass for accurate compositing
+    liveAdjPreview(); // WebGL at preview scale — live, smooth, no full-res cost
+    syncPresetActive();
   });
-  el.addEventListener('change',()=>pushSnapNow());
+  el.addEventListener('change',()=>{render();pushSnapNow();}); // full render on release
 }
 
 wireAdjSlider('adj-br','br','adj-br-v');
@@ -1938,11 +2120,17 @@ wireAdjSlider('adj-co','co','adj-co-v');
 wireAdjSlider('adj-sa','sa','adj-sa-v');
 wireAdjSlider('adj-ex','ex','adj-ex-v');
 wireAdjSlider('adj-sh','sh','adj-sh-v');
+wireAdjSlider('adj-bl','bl','adj-bl-v');
+wireAdjSlider('adj-hu','hu','adj-hu-v');
+wireAdjSlider('adj-te','te','adj-te-v');
+wireAdjSlider('adj-ti','ti','adj-ti-v');
+wireAdjSlider('adj-hl','hl','adj-hl-v');
+wireAdjSlider('adj-sd','sd','adj-sd-v');
 
 $('adj-reset-btn').addEventListener('click',()=>{
-  S.adj={br:0,co:0,sa:0,ex:0,sh:0};
+  S.adj={br:0,co:0,sa:0,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:0,sd:0};
   adjImgCache=null;
-  syncAdjUI();
+  syncAdjUI();syncPresetActive();
   applyAdjPreview();
   render();
   pushSnapNow();
@@ -1954,6 +2142,12 @@ function syncAdjUI(){
   $('adj-sa').value=S.adj.sa;$('adj-sa-v').textContent=S.adj.sa;
   $('adj-ex').value=S.adj.ex;$('adj-ex-v').textContent=S.adj.ex;
   $('adj-sh').value=S.adj.sh;$('adj-sh-v').textContent=S.adj.sh;
+  $('adj-bl').value=S.adj.bl||0;$('adj-bl-v').textContent=S.adj.bl||0;
+  $('adj-hu').value=S.adj.hu||0;$('adj-hu-v').textContent=S.adj.hu||0;
+  $('adj-te').value=S.adj.te||0;$('adj-te-v').textContent=S.adj.te||0;
+  $('adj-ti').value=S.adj.ti||0;$('adj-ti-v').textContent=S.adj.ti||0;
+  $('adj-hl').value=S.adj.hl||0;$('adj-hl-v').textContent=S.adj.hl||0;
+  $('adj-sd').value=S.adj.sd||0;$('adj-sd-v').textContent=S.adj.sd||0;
 }
 
 /* Initialise WebGL on first load */
@@ -2482,6 +2676,21 @@ function renderFade(ctx, W, H, imgRef, cropX, cropY, cw2, ch2, imgL, imgT){
     ctx.fillStyle=cg;
     ctx.fillRect(rx,ry,Math.ceil(rw),Math.ceil(rh));
   });
+
+  // Vignette — radial gradient from center outward
+  if((S.fd.vig||0)>0){
+    const va=(S.fd.vig/100)*0.82;
+    const[vr,vg,vb]=S.fd.vigCol==='light'?[255,255,255]:[0,0,0];
+    const cx=W/2,cy=H/2;
+    const inner=Math.min(W,H)*0.25;
+    const outer=Math.max(W,H)*0.78;
+    const vgrad=ctx.createRadialGradient(cx,cy,inner,cx,cy,outer);
+    vgrad.addColorStop(0,`rgba(${vr},${vg},${vb},0)`);
+    vgrad.addColorStop(0.5,`rgba(${vr},${vg},${vb},${(va*0.4).toFixed(3)})`);
+    vgrad.addColorStop(1,`rgba(${vr},${vg},${vb},${va.toFixed(3)})`);
+    ctx.fillStyle=vgrad;
+    ctx.fillRect(0,0,W,H);
+  }
 }
 
 /* ══════════════════════════════════════════════════
@@ -2655,6 +2864,100 @@ const loadedFonts=new Set();
 
 /* ── Preview ── */
 let rafPending=false,renderQueued=false;
+let _pcCtx=null; // cached preview context
+
+/* ── Live Adj Preview (WebGL at preview scale, rAF-gated) ── */
+let _adjLiveRaf=false;
+let _adjLiveSmall=null,_adjLiveSmallW=0,_adjLiveSmallH=0;
+
+function liveAdjPreview(){
+  if(!S.img||S.cropActive)return;
+  if(_adjLiveRaf)return;
+  _adjLiveRaf=true;
+  requestAnimationFrame(()=>{
+    _adjLiveRaf=false;
+    if(!S.img||S.cropActive)return;
+    if(GL_OK&&glReady){_glLivePreview();}
+    else{
+      // CSS filter fallback (no WebGL)
+      const a=S.adj;
+      const finalBr=((100+a.br)/100)*(1+a.ex/100);
+      const filters=[
+        `brightness(${finalBr.toFixed(3)})`,
+        `contrast(${((100+a.co)/100).toFixed(3)})`,
+        `saturate(${((100+a.sa)/100).toFixed(3)})`
+      ];
+      if(a.hu)filters.push(`hue-rotate(${a.hu}deg)`);
+      if(a.bl)filters.push(`blur(${(a.bl/100*8).toFixed(1)}px)`);
+      pcEl.style.filter=filters.join(' ');
+    }
+  });
+}
+
+function _glLivePreview(){
+  const pad=18;
+  const mxW=cwEl.clientWidth-pad,mxH=cwEl.clientHeight-pad;
+  if(mxW<=0||mxH<=0)return;
+
+  const cw2=Math.max(1,S.crop.w||S.iw),ch2=Math.max(1,S.crop.h||S.ih);
+  const W=cw2+S.ex.l+S.ex.r,H=ch2+S.ex.t+S.ex.b;
+  const scale=Math.min(mxW/W,mxH/H,1);
+  const dpr=window.devicePixelRatio||1;
+  const pvW=Math.max(1,Math.round(W*scale)),pvH=Math.max(1,Math.round(H*scale));
+  const imgW=Math.max(1,Math.round(cw2*scale)),imgH=Math.max(1,Math.round(ch2*scale));
+  const imgL=Math.round(S.ex.l*scale),imgT=Math.round(S.ex.t*scale);
+
+  // Downscale source image to preview size (fast GPU blit)
+  if(!_adjLiveSmall||_adjLiveSmallW!==imgW||_adjLiveSmallH!==imgH){
+    _adjLiveSmall=document.createElement('canvas');
+    _adjLiveSmallW=imgW;_adjLiveSmallH=imgH;
+  }
+  _adjLiveSmall.width=imgW;_adjLiveSmall.height=imgH;
+  _adjLiveSmall.getContext('2d').drawImage(S.img,S.crop.x,S.crop.y,cw2,ch2,0,0,imgW,imgH);
+
+  // Run adj shader at preview scale (fast — small canvas)
+  GL_CANVAS.width=imgW;GL_CANVAS.height=imgH;
+  GL.viewport(0,0,imgW,imgH);
+  GL.bindFramebuffer(GL.FRAMEBUFFER,null);
+
+  const a=S.adj;
+  const tex=glTex(GL,_adjLiveSmall);
+  GL.useProgram(progAdj);
+  GL.bindVertexArray(glVAO);
+  GL.activeTexture(GL.TEXTURE0);
+  GL.bindTexture(GL.TEXTURE_2D,tex);
+  GL.uniform1i(GL.getUniformLocation(progAdj,'u_tex'),0);
+  GL.uniform1f(GL.getUniformLocation(progAdj,'u_brightness'),a.br/100);
+  GL.uniform1f(GL.getUniformLocation(progAdj,'u_contrast'),(100+a.co)/100);
+  GL.uniform1f(GL.getUniformLocation(progAdj,'u_saturation'),(100+a.sa)/100);
+  GL.uniform1f(GL.getUniformLocation(progAdj,'u_exposure'),1+a.ex/100);
+  GL.uniform1f(GL.getUniformLocation(progAdj,'u_temperature'),(a.te||0)/100);
+  GL.uniform1f(GL.getUniformLocation(progAdj,'u_tint'),(a.ti||0)/100);
+  GL.uniform1f(GL.getUniformLocation(progAdj,'u_highlights'),(a.hl||0)/100);
+  GL.uniform1f(GL.getUniformLocation(progAdj,'u_shadows'),(a.sd||0)/100);
+  GL.uniform1f(GL.getUniformLocation(progAdj,'u_hue'),(a.hu||0)/360);
+  GL.drawArrays(GL.TRIANGLE_STRIP,0,4);
+  GL.bindVertexArray(null);
+  GL.flush();
+  GL.deleteTexture(tex);
+
+  // Draw result to pcEl
+  pcEl.width=Math.round(pvW*dpr);pcEl.height=Math.round(pvH*dpr);
+  pcEl.style.width=pvW+'px';pcEl.style.height=pvH+'px';
+  const blurPx=(a.bl||0)/100*8;
+  pcEl.style.filter=blurPx>0?`blur(${blurPx.toFixed(1)}px)`:'none';
+
+  if(!_pcCtx)_pcCtx=pcEl.getContext('2d');
+  const px=_pcCtx;
+  px.save();px.scale(dpr,dpr);px.clearRect(0,0,pvW,pvH);
+  // Expand border
+  px.fillStyle=S.ex.col==='white'?'#ffffff':'#000000';
+  px.fillRect(0,0,pvW,pvH);
+  // Adj image
+  px.imageSmoothingEnabled=true;px.imageSmoothingQuality='high';
+  px.drawImage(GL_CANVAS,0,0,imgW,imgH,imgL,imgT,imgW,imgH);
+  px.restore();
+}
 
 function render(){
   if(!S.img)return;
@@ -2663,7 +2966,7 @@ function render(){
   requestAnimationFrame(()=>{
     const again=renderQueued;renderQueued=false;
     doRender(OC,OX).then(()=>{
-      // Apply CSS filter for adjustment preview
+      // Apply CSS filter for crop overlay only; pcEl gets OC drawn directly
       applyAdjPreview();
       rafPending=false;
       if(S.cropActive)drawCropFull();
@@ -2689,7 +2992,9 @@ function updatePreview(){
   pvTop=(cwEl.clientHeight-cssH)/2;
   pcEl.width=Math.round(cssW*dpr);pcEl.height=Math.round(cssH*dpr);
   pcEl.style.width=cssW+'px';pcEl.style.height=cssH+'px';
-  const px=pcEl.getContext('2d');
+  pcEl.style.filter='none'; // adj is baked into OC — no CSS filter needed
+  if(!_pcCtx)_pcCtx=pcEl.getContext('2d');
+  const px=_pcCtx;
   px.save();px.scale(dpr,dpr);px.clearRect(0,0,cssW,cssH);
   px.imageSmoothingEnabled=true;px.imageSmoothingQuality='high';
   px.drawImage(OC,0,0,cssW,cssH);
@@ -2886,6 +3191,8 @@ function syncAllUI(){
   $('fd-str').value=S.fd.str;$('fd-str-v').textContent=S.fd.str+'%';
   $('fd-blur').value=S.fd.blur;$('fd-blur-v').textContent=S.fd.blur+' px';
   $('fd-border').checked=!!S.fd.border;
+  $('fd-vig').value=S.fd.vig||0;$('fd-vig-v').textContent=(S.fd.vig||0)+'%';
+  document.querySelectorAll('[data-vigcol]').forEach(b=>b.classList.toggle('active',b.dataset.vigcol===(S.fd.vigCol||'dark')));
   // Text
   rebuildTxtList();if(S.selTxt>=0&&S.selTxt<S.texts.length)syncTxtControls();
   // Adjustments
@@ -2903,7 +3210,77 @@ $('disc-open').addEventListener('click',()=>openModal('disc-ov'));
 $('disc-close').addEventListener('click',()=>closeModal('disc-ov'));
 updateCopyPasteBtns();
 
-/* ── Clock ── */
+/* ── Flip & Rotate ── */
+function applyImgTransform(drawFn,newW,newH){
+  if(!S.img)return;
+  const img=S.img,ow=S.iw,oh=S.ih;
+  const c=document.createElement('canvas');
+  c.width=newW;c.height=newH;
+  drawFn(c.getContext('2d'),ow,oh);
+  S.img=c;S.iw=newW;S.ih=newH;
+  S.crop={x:0,y:0,w:S.iw,h:S.ih};S.cropDraft={...S.crop};
+  adjImgCache=null;_adjLiveSmall=null;_adjLiveSmallW=0;_adjLiveSmallH=0;
+  invalidateGrainCache();
+  render();pushSnapNow();
+}
+function flipH(){applyImgTransform((ctx,w,h)=>{ctx.translate(w,0);ctx.scale(-1,1);ctx.drawImage(S.img,0,0);},S.iw,S.ih);}
+function flipV(){applyImgTransform((ctx,w,h)=>{ctx.translate(0,h);ctx.scale(1,-1);ctx.drawImage(S.img,0,0);},S.iw,S.ih);}
+function rotateCW(){
+  const img=S.img,w=S.iw,h=S.ih;
+  applyImgTransform(ctx=>{ctx.translate(h,0);ctx.rotate(Math.PI/2);ctx.drawImage(img,0,0);},h,w);
+}
+function rotateCCW(){
+  const img=S.img,w=S.iw,h=S.ih;
+  applyImgTransform(ctx=>{ctx.translate(0,w);ctx.rotate(-Math.PI/2);ctx.drawImage(img,0,0);},h,w);
+}
+$('btn-flip-h').addEventListener('click',flipH);
+$('btn-flip-v').addEventListener('click',flipV);
+$('btn-rot-cw').addEventListener('click',rotateCW);
+$('btn-rot-ccw').addEventListener('click',rotateCCW);
+
+/* ── Photo Presets ── */
+const ADJ_PRESETS={
+  original:{br:0,co:0,sa:0,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:0,sd:0},
+  warm:    {br:5,co:8,sa:15,ex:0,sh:10,bl:0,hu:0,te:40,ti:-5,hl:-10,sd:10},
+  cool:    {br:0,co:5,sa:5,ex:0,sh:10,bl:0,hu:0,te:-40,ti:10,hl:-5,sd:5},
+  vivid:   {br:0,co:25,sa:50,ex:5,sh:15,bl:0,hu:0,te:0,ti:0,hl:-10,sd:10},
+  matte:   {br:15,co:-25,sa:-15,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:-20,sd:20},
+  bw:      {br:0,co:10,sa:-100,ex:0,sh:15,bl:0,hu:0,te:0,ti:0,hl:0,sd:0},
+  faded:   {br:10,co:-30,sa:-20,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:-15,sd:15},
+  moody:   {br:-15,co:20,sa:10,ex:0,sh:10,bl:0,hu:0,te:-20,ti:0,hl:-20,sd:20},
+  golden:  {br:5,co:10,sa:15,ex:5,sh:0,bl:0,hu:0,te:35,ti:-10,hl:-10,sd:10},
+};
+function syncPresetActive(){
+  const cur=JSON.stringify({br:S.adj.br,co:S.adj.co,sa:S.adj.sa,ex:S.adj.ex,sh:S.adj.sh,bl:S.adj.bl||0,hu:S.adj.hu||0,te:S.adj.te||0,ti:S.adj.ti||0,hl:S.adj.hl||0,sd:S.adj.sd||0});
+  document.querySelectorAll('[data-preset]').forEach(b=>{
+    const pv=ADJ_PRESETS[b.dataset.preset];
+    b.classList.toggle('active',pv&&JSON.stringify(Object.assign({br:0,co:0,sa:0,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:0,sd:0},pv))===cur);
+  });
+}
+document.querySelectorAll('[data-preset]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(!S.img)return;
+    const pv=ADJ_PRESETS[btn.dataset.preset];
+    if(!pv)return;
+    Object.assign(S.adj,{br:0,co:0,sa:0,ex:0,sh:0,bl:0,hu:0,te:0,ti:0,hl:0,sd:0},pv);
+    adjImgCache=null;
+    syncAdjUI();syncPresetActive();
+    liveAdjPreview();
+    render();pushSnapNow();
+  });
+});
+
+/* ── Vignette events ── */
+$('fd-vig').addEventListener('input',function(){S.fd.vig=+this.value;$('fd-vig-v').textContent=this.value+'%';render();});
+$('fd-vig').addEventListener('change',()=>pushSnapNow());
+document.querySelectorAll('[data-vigcol]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('[data-vigcol]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');S.fd.vigCol=btn.dataset.vigcol;
+    render();pushSnapNow();
+  });
+});
+
 (function(){
   const el=$('hdr-clock');
   function tick(){
