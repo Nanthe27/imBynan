@@ -534,12 +534,12 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
   .fs-thumb{width:52px;min-width:52px;aspect-ratio:1}
   .fs-bot{padding:6px 4px;display:flex;align-items:center}
   .fs-add{width:44px;min-width:44px;height:44px;padding:0;margin:0}
-  .canvas-wrap{height:var(--mob-canvas);flex-shrink:0;flex-grow:0;display:flex;flex-direction:column}
+  .canvas-wrap{flex:1;height:auto;min-height:0;flex-shrink:1;flex-grow:1;display:flex;flex-direction:column}
   .cw{flex:1;padding:8px;min-height:0}
-  .save-bar{padding:7px 10px;height:44px}
+  .save-bar{padding:7px 10px;height:44px;flex-shrink:0}
   .tool-panel{
     position:fixed;bottom:var(--bnh);left:0;right:0;width:100%;
-    max-height:calc(100dvh - var(--mob-canvas) - var(--hh) - env(safe-area-inset-top,0) - var(--bnh) - env(safe-area-inset-bottom,0) - 44px - 2px);
+    max-height:62dvh;
     border-top:1px solid var(--border);border-left:none;border-radius:18px 18px 0 0;
     z-index:50;transform:translateY(110%);transition:transform var(--spring);
     box-shadow:0 -12px 48px rgba(0,0,0,.6);overflow-y:auto;overflow-x:hidden;
