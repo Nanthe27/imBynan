@@ -508,8 +508,8 @@ input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;bac
 .bnb.active{color:var(--act)}
 .bnb-lbl{font-family:'Quicksand',sans-serif;font-weight:600;font-size:.55rem;letter-spacing:.02em}
 .bnb:active{transform:scale(.88)}
-.pov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:44;opacity:0;transition:opacity .3s ease;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
-.pov.active{opacity:1}
+.pov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:44;opacity:0;transition:opacity .3s ease;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);pointer-events:none}
+.pov.active{opacity:1;pointer-events:all}
 
 /* Tablet */
 @media(max-width:900px){
